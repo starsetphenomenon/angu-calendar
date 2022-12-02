@@ -24,11 +24,11 @@ export class CalendarComponent implements OnInit {
         this.calendar = this.createCalendar(this.date);
     }
 
-    setCalendarType = (e: any) => {
+    setCalendarType (e: any) {
         this.calendarType = e.target.name;
     }
 
-    getCurrentMonth = (e:any) => {
+    getCurrentMonth (e:any) {
         this.calendarType = 'month';
         this.calendar = this.createCalendar(this.date.month(e.target.getAttribute('name')));
     }
