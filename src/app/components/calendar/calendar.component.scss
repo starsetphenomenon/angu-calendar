@@ -16,6 +16,8 @@
   .current {
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
 
   .current__val {
@@ -23,6 +25,7 @@
     justify-content: center;
     align-items: center;
     width: 250px;
+    margin: 0;
   }
 
   &__content,
@@ -50,3 +53,4 @@
     align-items: center;
   }
 }
+

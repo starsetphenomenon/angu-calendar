@@ -8,6 +8,12 @@ interface CalendarItem {
     isWeekend: boolean;
 }
 
+interface AbsenceType {
+    value: string;
+    viewValue: string;
+}
+
+
 @Component({
     selector: 'app-calendar',
     templateUrl: './calendar.component.html',
@@ -19,16 +25,23 @@ export class CalendarComponent implements OnInit {
     calendar: Array<CalendarItem[]> = [];
     calendarType: string = 'month';
     months = moment.months();
+    selectedAbsence = '';
+    absenceTypes: AbsenceType[] = [
+        { value: 'sick', viewValue: 'Sick' },
+        { value: 'vacation', viewValue: 'Vacation' }
+    ];
+
+
 
     ngOnInit(): void {
         this.calendar = this.createCalendar(this.date);
     }
 
-    setCalendarType (e: any) {
-        this.calendarType = e.target.name;
+    setCalendarType(value: string) {
+        this.calendarType = value;
     }
 
-    setCurrentMonth (e:any) {
+    setCurrentMonth(e: any) {
         this.calendarType = 'month';
         this.calendar = this.createCalendar(this.date.month(e.target.getAttribute('name')));
     }
