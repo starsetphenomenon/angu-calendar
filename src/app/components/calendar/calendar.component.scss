@@ -26,25 +26,37 @@
   }
 
   &__content {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-auto-rows: 100px;
+    &__wrapper {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-auto-rows: 100px;
 
-    &__day,
-    &__titles {
-      padding: 5px;
-    }
+      .month {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-    &__day {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
+      &__day,
+      &__titles {
+        padding: 5px;
+      }
 
-    &__titles {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      &__day {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      &__day.light {
+        opacity: 0.4;
+      }
+
+      &__titles {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
     }
   }
 }
