@@ -11,52 +11,42 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-
-    .current {
-      display: flex;
-      flex-direction: row;
-
-      &__val {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 250px;
-      }
-    }
   }
 
-  &__content {
-    &__wrapper {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      grid-auto-rows: 100px;
+  .current {
+    display: flex;
+    flex-direction: row;
+  }
 
-      .month {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+  .current__val {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+  }
 
-      &__day,
-      &__titles {
-        padding: 5px;
-      }
+  &__content,
+  &__content-byYears {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: 100px;
+  }
 
-      &__day {
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-      }
+  .day {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 5px;
+    height: 100%;
+  }
 
-      &__day.light {
-        opacity: 0.4;
-      }
+  .day.light {
+    opacity: 0.4;
+  }
 
-      &__titles {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-    }
+  &__content__titles {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }

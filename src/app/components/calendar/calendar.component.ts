@@ -22,7 +22,6 @@ export class CalendarComponent implements OnInit {
 
     ngOnInit(): void {
         this.calendar = this.createCalendar(this.date);
-        console.log(this.months)
     }
 
     setCalendarType = (e: any) => {
@@ -31,7 +30,7 @@ export class CalendarComponent implements OnInit {
 
     getCurrentMonth = (e:any) => {
         this.calendarType = 'month';
-        this.calendar = this.createCalendar(this.date.month(e.target.id));
+        this.calendar = this.createCalendar(this.date.month(e.target.getAttribute('name')));
     }
 
     createCalendar(month: moment.Moment) {
@@ -98,22 +97,22 @@ export class CalendarComponent implements OnInit {
         };
     }
 
-    public nextmonth() {
+    setNextMonth() {
         this.date.add(1, 'months');
         this.calendar = this.createCalendar(this.date);
     }
 
-    public nextyear() {
+    setNextYear() {
         this.date.add(1, 'year');
         this.calendar = this.createCalendar(this.date);
     }
 
-    public previousyear() {
+    setPreviousYear() {
         this.date.subtract(1, 'year');
         this.calendar = this.createCalendar(this.date);
     }
 
-    public previousmonth() {
+    setPreviousMonth() {
         this.date.subtract(1, 'months');
         this.calendar = this.createCalendar(this.date);
     }
