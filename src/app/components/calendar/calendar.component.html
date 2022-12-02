@@ -1,0 +1,34 @@
+<div class="calendar">
+  <div class="calendar__header">
+    <h1>Calendar</h1>
+    <div class="switch">
+      <button>Month</button>
+      <button>Year</button>
+    </div>
+  </div>
+  <div class="calendar__filters">
+    <div class="current">
+      <button (click)="previousmonth()"></button>
+      <h4 class="current__val"><b>{{date.format('MMMM ')}}{{date.format('YYYY ')}}</b></h4>
+      <button (click)="nextmonth()"></button>
+    </div>
+    <div class="filter">
+      Filter by absence typy
+      <select name="" id="">
+        <option value="vacation">Vacation</option>
+        <option value="sick">Sick</option>
+      </select>
+    </div>
+  </div>
+  <div *ngFor="let calendarItem of calendar; let i = index">
+    <div class="calendar__content">
+      <div class="calendar-days" [class.weekend]="day.isWeekend" [ngClass]="day.className"
+        *ngFor="let day of calendarItem">
+        <div class="calendar__content__titles" *ngIf="i === 0">{{day.dayName}}</div>
+        <div class="calendar__content__day">
+          {{day.day}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
