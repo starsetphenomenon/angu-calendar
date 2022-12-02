@@ -28,7 +28,7 @@ export class CalendarComponent implements OnInit {
         this.calendarType = e.target.name;
     }
 
-    getCurrentMonth (e:any) {
+    setCurrentMonth (e:any) {
         this.calendarType = 'month';
         this.calendar = this.createCalendar(this.date.month(e.target.getAttribute('name')));
     }

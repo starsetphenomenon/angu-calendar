@@ -30,7 +30,7 @@
       <div class="calendar__content">
         <div [class.weekend]="day.isWeekend" [ngClass]="day.className"
           *ngFor="let day of calendarItem">
-          <div class="calendar__content__titles" *ngIf="i === 0">{{day.dayName}}</div>
+          <div class="calendar__content-titles" *ngIf="i === 0">{{day.dayName}}</div>
           <div
             [ngClass]="day.className === 'in-month' ? 'day' : 'day light'">
             {{day.day}}
@@ -39,9 +39,9 @@
       </div>
     </div>
   </div>
-  <div *ngIf="calendarType === 'year'" class="calendar__content-byYears">
+  <div *ngIf="calendarType === 'year'" class="calendar__content-years">
     <div *ngFor="let month of months; let i = index">
-      <div [attr.name]="month" (click)="getCurrentMonth($event)" class="month">
+      <div [attr.name]="month" (click)="setCurrentMonth($event)" class="month">
         {{month}}
       </div>
     </div>
