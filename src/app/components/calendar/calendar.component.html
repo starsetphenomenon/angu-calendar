@@ -2,15 +2,20 @@
   <div class="calendar__header">
     <h1>Calendar</h1>
     <div class="switch">
-      <button>Month</button>
-      <button>Year</button>
+      <button name="month" (click)="setCalendarType($event)">Month</button>
+      <button name="year" (click)="setCalendarType($event)">Year</button>
     </div>
   </div>
   <div class="calendar__filters">
-    <div class="current">
-      <button (click)="previousmonth()"></button>
+    <div *ngIf="calendarType==='month'" class="current">
+      <button (click)="setPreviousMonth()"></button>
       <h4 class="current__val"><b>{{date.format('MMMM ')}}{{date.format('YYYY ')}}</b></h4>
-      <button (click)="nextmonth()"></button>
+      <button (click)="setNextMonth()"></button>
+    </div>
+    <div *ngIf="calendarType==='year'" class="current">
+      <button (click)="setPreviousYear()"></button>
+      <h4 class="current__val"><b>{{date.format('YYYY ')}}</b></h4>
+      <button (click)="setNextYear()"></button>
     </div>
     <div class="filter">
       Filter by absence typy
@@ -20,15 +25,24 @@
       </select>
     </div>
   </div>
-  <div *ngFor="let calendarItem of calendar; let i = index">
-    <div class="calendar__content">
-      <div class="calendar-days" [class.weekend]="day.isWeekend" [ngClass]="day.className"
-        *ngFor="let day of calendarItem">
-        <div class="calendar__content__titles" *ngIf="i === 0">{{day.dayName}}</div>
-        <div class="calendar__content__day">
-          {{day.day}}
+  <div *ngIf="calendarType === 'month'">
+    <div *ngFor="let calendarItem of calendar; let i = index">
+      <div class="calendar__content">
+        <div [class.weekend]="day.isWeekend" [ngClass]="day.className"
+          *ngFor="let day of calendarItem">
+          <div class="calendar__content-titles" *ngIf="i === 0">{{day.dayName}}</div>
+          <div
+            [ngClass]="day.className === 'in-month' ? 'day' : 'day light'">
+            {{day.day}}
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+  <div *ngIf="calendarType === 'year'" class="calendar__content-years">
+    <div *ngFor="let month of months; let i = index">
+      <div [attr.name]="month" (click)="setCurrentMonth($event)" class="month">
+        {{month}}
+      </div>
+    </div>
+  </div>

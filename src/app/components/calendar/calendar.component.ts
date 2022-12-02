@@ -6,7 +6,7 @@ interface CalendarItem {
     dayName: string;
     className: string;
     isWeekend: boolean;
-  }
+}
 
 @Component({
     selector: 'app-calendar',
@@ -17,10 +17,20 @@ interface CalendarItem {
 export class CalendarComponent implements OnInit {
     date = moment();
     calendar: Array<CalendarItem[]> = [];
+    calendarType: string = 'month';
+    months = moment.months();
 
     ngOnInit(): void {
         this.calendar = this.createCalendar(this.date);
-        console.log(this.calendar)
+    }
+
+    setCalendarType (e: any) {
+        this.calendarType = e.target.name;
+    }
+
+    setCurrentMonth (e:any) {
+        this.calendarType = 'month';
+        this.calendar = this.createCalendar(this.date.month(e.target.getAttribute('name')));
     }
 
     createCalendar(month: moment.Moment) {
@@ -31,7 +41,7 @@ export class CalendarComponent implements OnInit {
         const calendar: CalendarItem[] = [];
 
         const daysBefore = weekdaysShort.indexOf(startOfMonth);
-        const daysAfter = weekdaysShort.length - 1 - weekdaysShort.indexOf(endOfMonth);
+        const daysAfter = weekdaysShort.length - weekdaysShort.indexOf(endOfMonth);
 
         const clone = month.startOf('months').clone();
         if (daysBefore > 0) {
@@ -53,8 +63,7 @@ export class CalendarComponent implements OnInit {
             clone.add(1, 'days');
         }
 
-
-        return calendar.reduce((pre: Array<CalendarItem[]>, curr: CalendarItem) => {
+        let result = calendar.reduce((pre: Array<CalendarItem[]>, curr: CalendarItem) => {
             if (pre[pre.length - 1].length < weekdaysShort.length) {
                 pre[pre.length - 1].push(curr);
             } else {
@@ -62,6 +71,20 @@ export class CalendarComponent implements OnInit {
             }
             return pre;
         }, [[]]);
+
+        let temp: CalendarItem[] = [];
+        result.forEach((el, ind) => {
+            temp.push(el[0])
+            el.shift()
+        })
+        result.forEach((el, ind, arr) => {
+            if (ind === arr.length - 1) {
+                return
+            }
+            el.push(temp[ind + 1])
+        })
+
+        return result;
     }
 
     createCalendarItem(data: moment.Moment, className: string) {
@@ -74,12 +97,22 @@ export class CalendarComponent implements OnInit {
         };
     }
 
-    public nextmonth() {
+    setNextMonth() {
         this.date.add(1, 'months');
         this.calendar = this.createCalendar(this.date);
     }
 
-    public previousmonth() {
+    setNextYear() {
+        this.date.add(1, 'year');
+        this.calendar = this.createCalendar(this.date);
+    }
+
+    setPreviousYear() {
+        this.date.subtract(1, 'year');
+        this.calendar = this.createCalendar(this.date);
+    }
+
+    setPreviousMonth() {
         this.date.subtract(1, 'months');
         this.calendar = this.createCalendar(this.date);
     }

@@ -11,40 +11,42 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-
-    .current {
-      display: flex;
-      flex-direction: row;
-
-      &__val {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 250px;
-      }
-    }
   }
 
-  &__content {
+  .current {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .current__val {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+  }
+
+  &__content,
+  &__content-years {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-auto-rows: 100px;
+  }
 
-    &__day,
-    &__titles {
-      padding: 5px;
-    }
+  .day {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 5px;
+    height: 100%;
+  }
 
-    &__day {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
+  .day.light {
+    opacity: 0.4;
+  }
 
-    &__titles {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+  &__content-titles {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
