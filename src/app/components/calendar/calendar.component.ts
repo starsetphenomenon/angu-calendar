@@ -69,7 +69,8 @@ export class CalendarComponent implements OnInit, DoCheck {
         let checkAbse = true;
         this.absencesArray.forEach(el => {
             if (el.fromDate === this.requestService.dialogData.fromDate || el.toDate === this.requestService.dialogData.toDate
-                || el.toDate === this.requestService.dialogData.fromDate || el.fromDate === this.requestService.dialogData.toDate) {
+                || el.toDate === this.requestService.dialogData.fromDate || el.fromDate === this.requestService.dialogData.toDate
+                || this.requestService.dialogData.toDate === '' || this.requestService.dialogData.fromDate === '') {
                 checkAbse = false
             }
         })
@@ -78,7 +79,6 @@ export class CalendarComponent implements OnInit, DoCheck {
         }
         this.showDialog = this.dialogService.showDialog;
         this.calendar = this.createCalendar(this.date);
-        console.log(this.absencesArray)
     }
 
     handleDialogView(state: boolean) {

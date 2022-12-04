@@ -71,6 +71,7 @@
 
   &__content {
     margin-bottom: 4px;
+    overflow: hidden;
   }
 
   .titles {
@@ -101,15 +102,22 @@
     flex-direction: column;
     padding: 0;
     height: 100%;
+    padding: 5px 0;
+    overflow: hidden; 
 
     &:hover {
-      background: orange;
+      box-shadow: 0 4px 0 rgb(0, 102, 227) inset;
     }
 
     &-comment {
+      display: block;
       align-self: flex-end;
       width: 100%;
       padding: 0 5px;
+      max-width: 100px;
+      overflow: hidden;
+      word-wrap: break-word;
+      word-break: normal;
     }
 
     .taken {

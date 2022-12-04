@@ -24,7 +24,7 @@ export class DialogComponent implements DoCheck {
     }
 
     onRequest(data: any) {
-        this.requestService.onRequest({ ...data, taken: true })
+        this.requestService.onRequest({ ...data, taken: true })        
         this.handleDialogView(false)
     }
 

@@ -1,5 +1,5 @@
 .dialog {
-  width: 50vw;
+  width: 500px;
   padding: 30px;
   position: fixed;
   top: 50%;
@@ -19,6 +19,7 @@
     .dates{
         display: flex;
         flex-direction: row;
+        justify-content: space-between;
         gap: 15px;
     }
     &-item {
