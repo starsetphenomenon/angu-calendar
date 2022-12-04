@@ -1,51 +1,76 @@
-<div class="calendar">
-  <div class="calendar__header">
-    <h1>Calendar</h1>
-    <div class="switch">
-      <!-- <button name="month" (click)="setCalendarType($event)">Month</button>
-      <button name="year" (click)="setCalendarType($event)">Year</button> -->
-      <mat-button-toggle-group [(ngModel)]="calendarType" aria-label="Favorite Color">
-        <mat-button-toggle (click)="setCalendarType(calendarType)" value="month">Month</mat-button-toggle>
-        <mat-button-toggle (click)="setCalendarType(calendarType)" value="year">Year</mat-button-toggle>
-      </mat-button-toggle-group>
+<div class="content-wrapper">
+  <div class="calendar">
+    <div class="calendar__header">
+      <h1 class="bold">Calendar</h1>
+      <div class="switch">
+        <mat-button-toggle-group [(ngModel)]="calendarType">
+          <mat-button-toggle class="bold" (click)="setCalendarType(calendarType)" value="month">Month
+          </mat-button-toggle>
+          <mat-button-toggle class="bold" (click)="setCalendarType(calendarType)" value="year">Year</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
     </div>
-  </div>
-  <div class="calendar__filters">
-    <div *ngIf="calendarType==='month'" class="current">
-      <mat-icon class="arrow" (click)="setPreviousMonth()">keyboard_arrow_left</mat-icon>
-      <h4 class="current__val"><b>{{date.format('MMMM ')}}{{date.format('YYYY ')}}</b></h4>
-      <mat-icon class="arrow" (click)="setNextMonth()">keyboard_arrow_right</mat-icon>
+    <div class="calendar__filters">
+      <div class="current" [ngSwitch]="calendarType">
+        <div *ngSwitchCase="'month'" class="current">
+          <mat-icon class="arrow" (click)="setCurrentDate(-1, 'month')">keyboard_arrow_left</mat-icon>
+          <h3 class="current__val">{{date.format('MMMM ')}}{{date.format('YYYY ')}}</h3>
+          <mat-icon class="arrow" (click)="setCurrentDate(1, 'month')">keyboard_arrow_right</mat-icon>
+        </div>
+        <div *ngSwitchCase="'year'" class="current">
+          <mat-icon class="arrow" (click)="setCurrentDate(-1, 'year')">keyboard_arrow_left</mat-icon>
+          <h3 class="current__val">{{date.format('YYYY ')}}</h3>
+          <mat-icon class="arrow" (click)="setCurrentDate(1, 'year')">keyboard_arrow_right</mat-icon>
+        </div>
+      </div>
+      <mat-form-field class="filter" appearance="fill">
+        <mat-label class="filter-select bolder">Filter by absence type</mat-label>
+        <mat-select [(value)]="selectedAbsenceFilter">
+          <mat-option *ngFor="let item of absenceTypes" [value]="item.value">
+            {{item.viewValue}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
-    <div *ngIf="calendarType==='year'" class="current">
-      <mat-icon class="arrow" (click)="setPreviousYear()">keyboard_arrow_left</mat-icon>
-      <h4 class="current__val"><b>{{date.format('YYYY ')}}</b></h4>
-      <mat-icon class="arrow" (click)="setNextYear()">keyboard_arrow_right</mat-icon>
-    </div>
-    <mat-form-field class="filter" appearance="fill">
-      <mat-label>Filter by absence type </mat-label>
-      <mat-select [(value)]="selectedAbsence">
-        <mat-option *ngFor="let item of absenceTypes" [value]="item.value">
-          {{item.viewValue}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
-  <div *ngIf="calendarType === 'month'">
-    <div *ngFor="let calendarItem of calendar; let i = index">
-      <div class="calendar__content">
-        <div [class.weekend]="day.isWeekend" [ngClass]="day.className" *ngFor="let day of calendarItem">
-          <div class="calendar__content-titles" *ngIf="i === 0">{{day.dayName}}</div>
-          <div [ngClass]="day.className === 'in-month' ? 'day' : 'day light'">
-            {{day.day}}
+    <div [ngSwitch]="calendarType">
+      <div *ngSwitchCase="'month'">
+        <div class="titles">
+          <div *ngFor="let day of weekDays" class="titles__item">{{day}}</div>
+        </div>
+        <div *ngFor="let calendarItem of calendar; let i = index">
+          <div class="calendar__content">
+            <div [class.weekend]="day.isWeekend" [ngClass]="day.className" *ngFor="let day of calendarItem">
+
+              <div class="day" [class.light]="day.className!=='in-month'">
+                {{day.day}}
+                <span [class.taken]="day.absence.taken" class="day-comment">{{day.absence.comment}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngSwitchCase="'year'" class="calendar__content-years">
+        <div *ngFor="let month of months; let i = index">
+          <div [attr.name]="month" (click)="setCurrentMonth($event)" class="month">
+            {{month}}
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div *ngIf="calendarType === 'year'" class="calendar__content-years">
-    <div *ngFor="let month of months; let i = index">
-      <div [attr.name]="month" (click)="setCurrentMonth($event)" class="month">
-        {{month}}
+  <div class="absence">
+    <div class="request">
+      <button (click)="handleDialogView(true)" class="request-button" mat-flat-button color="primary">Request
+        absence</button>
+    </div>
+    <div class="absence__types">
+      <h2 class="bold">Absence types</h2>
+      <div class="vacation">
+      </div>
+      <div class="sick">
       </div>
     </div>
   </div>
+</div>
+
+<app-dialog [selectedAbsence]="selectedAbsenceType" [absenceTypes]="absenceTypes" *ngIf="showDialog"></app-dialog>

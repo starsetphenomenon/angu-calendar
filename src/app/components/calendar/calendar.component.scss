@@ -1,16 +1,48 @@
-.calendar {
-  height: 100%;
-  width: 80vw;
+.content-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 30px;
   margin: 30px;
+}
+
+.absence {
+  width: 30vw;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 10px;
+
+  .request {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .request-button {
+    text-transform: capitalize;
+  }
+}
+
+.calendar {
+  height: 100%;
+  width: 70vw;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 
   &__header,
   &__filters {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    height: auto;
+  }
+
+  .filter {
+    &-select {
+      font-size: 14px;
+
+    }
   }
 
   .current {
@@ -24,20 +56,71 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 250px;
+    width: 160px;
     margin: 0;
   }
 
   &__content,
-  &__content-years {
+  &__content-years,
+  .titles {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-auto-rows: 100px;
+    gap: 4px;
+  }
+
+  &__content {
+    margin-bottom: 4px;
+  }
+
+  .titles {
+    grid-auto-rows: 40px;
+
+    &__item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .day,
+  .month {
+    background: lightblue;
+  }
+
+  .titles {
+    background: lightsalmon;
+    margin-bottom: 4px;
+    border-radius: 8px 8px 0 0;
   }
 
   .day {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex-direction: column;
+    padding: 0;
+    height: 100%;
+
+    &:hover {
+      background: orange;
+    }
+
+    &-comment {
+      align-self: flex-end;
+      width: 100%;
+      padding: 0 5px;
+    }
+
+    .taken {
+      background: rgb(192, 57, 57);
+      color: #fff;
+    }
+  }
+
+  .month {
+    display: flex;
+    justify-content: center;
     align-items: center;
     padding: 5px;
     height: 100%;
@@ -54,3 +137,10 @@
   }
 }
 
+.bold {
+  font-weight: bold;
+}
+
+.bolder {
+  font-weight: bolder;
+}

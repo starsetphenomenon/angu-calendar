@@ -1,0 +1,36 @@
+<div *ngIf="showDialog" class="dialog-wrapper">
+  <div class="dialog">
+    <div class="header">
+      <h2>Request Absence</h2>
+      <div (click)="handleDialogView(false)" class="close">
+        <mat-icon>close</mat-icon>
+      </div>
+    </div>
+    <div class="content">
+      <div class="content-item">
+        <h3>What type of absence?</h3>
+        <mat-select (selectionChange)="formOnChange('absType', selectedAbsence)" class="bordered" [(ngModel)]="selectedAbsence">
+          <mat-option *ngFor="let item of absenceTypes" [value]="item.value">
+            {{item.viewValue}}
+          </mat-option>
+        </mat-select>
+      </div>
+      <div class="content-item">
+        <h3>From - To</h3>
+        <div class="dates">
+          <input #fromDate (change)="formOnChange('fromDate', fromDate.value)" class="bordered" type="date" name="from">
+          <input #toDate (change)="formOnChange('toDate', toDate.value)" class="bordered" type="date" name="to">
+        </div>
+      </div>
+      <div class="content-item wide">
+        <h3>Comment</h3>
+        <textarea name="comment" (change)="formOnChange(comment.name, comment.value)" #comment class="bordered" matInput placeholder="Add a comment..."></textarea>
+      </div>
+    </div>
+    <div class="footer">
+      <button (click)="handleDialogView(false)" mat-flat-button>Cancel</button>
+      <button (click)="onRequest(dialogData)" mat-flat-button color="primary">Request</button>
+    </div>
+  </div>
+  <div (click)="handleDialogView(false)" class="wrapper"></div>
+</div>
