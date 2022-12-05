@@ -6,9 +6,19 @@ import { Injectable } from '@angular/core';
 
 export class DialogService {
 
-    showDialog = false;
+  dialogs: any = {
+    requestDialog: false,
+    updateDialog: false,
+  }
 
-    handleDialogView(state:boolean) {
-      this.showDialog = state;
-    }
+  currentAbsence: any = {}
+
+
+  handleDialogView(state: boolean, dialog: any) {
+    this.dialogs[dialog] = state;
+  }
+
+  setCurrentAbs(abs: any) {
+    this.currentAbsence = { ...abs }
+  }
 }

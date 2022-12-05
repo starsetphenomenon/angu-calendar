@@ -35,7 +35,7 @@ export interface AbsenceType {
 export class CalendarComponent implements OnInit, DoCheck {
 
     constructor(private dialogService: DialogService, private requestService: RequestService) {
-        this.showDialog = dialogService.showDialog;
+        this.showDialog = dialogService.dialogs.requestDialog;
     }
 
     date = moment();
@@ -50,15 +50,9 @@ export class CalendarComponent implements OnInit, DoCheck {
         { value: 'vacation', viewValue: 'Vacation' }
     ];
     showDialog = false;
-    absencesArray: AbsenceItem[] = [
-        {
-            absType: 'sick',
-            fromDate: '2022-12-03',
-            toDate: '2022-12-05',
-            comment: 'I am sick now...',
-            taken: false,
-        }
-    ]
+    updateDialog = true;
+
+    currentAbsence = {}
 
 
     ngOnInit(): void {
@@ -67,7 +61,7 @@ export class CalendarComponent implements OnInit, DoCheck {
 
     ngDoCheck() {
         let checkAbse = true;
-        this.absencesArray.forEach(el => {
+        this.requestService.absencesArray.forEach(el => {
             if (el.fromDate === this.requestService.dialogData.fromDate || el.toDate === this.requestService.dialogData.toDate
                 || el.toDate === this.requestService.dialogData.fromDate || el.fromDate === this.requestService.dialogData.toDate
                 || this.requestService.dialogData.toDate === '' || this.requestService.dialogData.fromDate === '') {
@@ -75,14 +69,26 @@ export class CalendarComponent implements OnInit, DoCheck {
             }
         })
         if (checkAbse) {
-            this.absencesArray.push(this.requestService.dialogData)
+            this.requestService.absencesArray.push(this.requestService.dialogData)
         }
-        this.showDialog = this.dialogService.showDialog;
+        this.showDialog = this.dialogService.dialogs.requestDialog;
         this.calendar = this.createCalendar(this.date);
     }
 
-    handleDialogView(state: boolean) {
-        this.dialogService.handleDialogView(state)
+    updateAbsence(fullDate: string) {
+        let currAbs = this.requestService.absencesArray.find(item => item.fromDate === fullDate || item.toDate === fullDate
+            || moment(fullDate).isBetween(item.fromDate, item.toDate))
+        this.currentAbsence = { ...currAbs }
+        this.dialogService.currentAbsence = this.currentAbsence
+        this.handleDialogView(true, 'updateDialog')
+        this.requestService.deleteAbsDate = fullDate;
+    }
+
+    handleDialogView(state: boolean, dialog: any) {
+        if (dialog === 'requestDialog') {
+            this.currentAbsence = {}
+        }
+        this.dialogService.handleDialogView(state, dialog)
     }
 
     setCalendarType(value: string) {
@@ -125,7 +131,7 @@ export class CalendarComponent implements OnInit, DoCheck {
         }
 
         let result = calendar.reduce((pre: Array<CalendarItem[]>, curr: CalendarItem) => {
-            this.absencesArray.forEach(abs => {
+            this.requestService.absencesArray.forEach(abs => {
                 if (moment(curr.fullDate).isBetween(abs.fromDate, abs.toDate)) { // mark all days btw the dates
                     curr.absence = {
                         absType: abs.absType,
@@ -156,7 +162,7 @@ export class CalendarComponent implements OnInit, DoCheck {
             comment: '',
             taken: false,
         }
-        this.absencesArray.forEach(el => {
+        this.requestService.absencesArray.forEach(el => {
             if (el.fromDate === data.format('YYYY-MM-DD') || el.toDate === data.format('YYYY-MM-DD')) {
                 absenceItem = {
                     absType: el.absType,

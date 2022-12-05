@@ -1,7 +1,7 @@
 <div *ngIf="showDialog" class="dialog-wrapper">
   <div class="dialog">
     <div class="header">
-      <h2>Request Absence</h2>
+      <h2>{{title}}</h2>
       <div (click)="handleDialogView(false)" class="close">
         <mat-icon>close</mat-icon>
       </div>
@@ -20,11 +20,13 @@
         <h3>From - To</h3>
         <div class="dates">
           <mat-form-field class="dates-item" appearance="fill">
+            <mat-label *ngIf="currentAbsence.fromDate">{{currentAbsence.fromDate}}</mat-label>
             <input (dateInput)="formOnChange('fromDate', $event.value)" matInput [matDatepicker]="fromDate">
             <mat-datepicker-toggle matIconSuffix [for]="fromDate"></mat-datepicker-toggle>
             <mat-datepicker #fromDate></mat-datepicker>
           </mat-form-field>
           <mat-form-field class="dates-item" appearance="fill">
+            <mat-label *ngIf="currentAbsence.toDate">{{currentAbsence.toDate}}</mat-label>
             <input (dateInput)="formOnChange('toDate', $event.value)" matInput [matDatepicker]="toDate">
             <mat-datepicker-toggle matIconSuffix [for]="toDate"></mat-datepicker-toggle>
             <mat-datepicker #toDate></mat-datepicker>
@@ -32,12 +34,18 @@
         </div>
       </div>
       <div class="content-item wide">
-        <h3>Comment</h3>
-        <textarea name="comment" (change)="formOnChange(comment.name, comment.value)" #comment class="bordered" matInput
+        <h3 *ngIf="!currentAbsence.comment">Comment</h3>  
+        <h3 *ngIf="currentAbsence.comment">Note</h3>
+        <span *ngIf="currentAbsence.comment">{{currentAbsence.comment}}</span>
+        <textarea *ngIf="!currentAbsence.comment" name="comment" (change)="formOnChange(comment.name, comment.value)" #comment class="bordered" matInput
           placeholder="Add a comment..."></textarea>
       </div>
     </div>
-    <div class="footer">
+    <div *ngIf="name==='updateDialog'" class="footer">
+      <button (click)="deleteAbsence()" color="warn" mat-flat-button>Delete Absence</button>
+      <button (click)="onUpdateAbs(dialogData)" mat-flat-button color="primary">Update</button>
+    </div>
+    <div *ngIf="name==='requestDialog'" class="footer">
       <button (click)="handleDialogView(false)" mat-flat-button>Cancel</button>
       <button (click)="onRequest(dialogData)" mat-flat-button color="primary">Request</button>
     </div>

@@ -1,4 +1,4 @@
-import { Component, Input, DoCheck, ElementRef, ViewChild } from '@angular/core';
+import { Component, Input, DoCheck } from '@angular/core';
 import { AbsenceType } from '../calendar/calendar.component';
 import { DialogService } from '../../services/dialog.service';
 import { RequestService } from '../../services/request.service';
@@ -10,32 +10,43 @@ import * as moment from 'moment';
     styleUrls: ['./dialog.component.scss']
 })
 
+
+
 export class DialogComponent implements DoCheck {
     dateNow = new Date()
-    showDialog = true;
     absType = '';
     dialogData = {};
 
     constructor(private dialogService: DialogService, private requestService: RequestService) {
-        this.showDialog = dialogService.showDialog
+        this.showDialog = dialogService.dialogs[this.name]
     }
 
     getMomentDate(date: string) {
-        return moment(date).format('MM/DD/YYYY')
+        return new Date(date)
+    }
+
+    onUpdateAbs(data: any) {
+        this.requestService.updateAbsArr(data, this.dialogService.currentAbsence)
+              
+
+        this.handleDialogView(false)
     }
 
     handleDialogView(state: boolean) {
-        this.dialogService.handleDialogView(state);
+        this.dialogService.handleDialogView(state, this.name);
+    }
+
+    deleteAbsence() {
+        this.requestService.deleteAbsence()
     }
 
     onRequest(data: any) {
         this.requestService.onRequest({ ...data, taken: true })
         this.handleDialogView(false)
-        console.log(data)
     }
 
     ngDoCheck() {
-        this.showDialog = this.dialogService.showDialog;
+        this.showDialog = this.dialogService.dialogs[this.name]
     }
 
     formOnChange(name: string, value: any) {
@@ -51,5 +62,8 @@ export class DialogComponent implements DoCheck {
     @Input() absenceTypes: AbsenceType[];
     @Input() selectedAbsence: string;
     @Input() isShown: boolean;
-
+    @Input() showDialog: boolean;
+    @Input() name: string;
+    @Input() currentAbsence: any;
+    @Input() title: string;
 }
