@@ -9,7 +9,8 @@
     <div class="content">
       <div class="content-item">
         <h3>What type of absence?</h3>
-        <mat-select (selectionChange)="formOnChange('absType', selectedAbsence)" class="bordered" [(ngModel)]="selectedAbsence">
+        <mat-select (selectionChange)="formOnChange('absType', selectedAbsence)" class="bordered"
+          [(ngModel)]="selectedAbsence">
           <mat-option *ngFor="let item of absenceTypes" [value]="item.value">
             {{item.viewValue}}
           </mat-option>
@@ -18,13 +19,22 @@
       <div class="content-item">
         <h3>From - To</h3>
         <div class="dates">
-          <input #fromDate (change)="formOnChange('fromDate', fromDate.value)" class="bordered" type="date" name="from">
-          <input #toDate (change)="formOnChange('toDate', toDate.value)" class="bordered" type="date" name="to">
+          <mat-form-field class="dates-item" appearance="fill">
+            <input (dateInput)="formOnChange('fromDate', $event.value)" matInput [matDatepicker]="fromDate">
+            <mat-datepicker-toggle matIconSuffix [for]="fromDate"></mat-datepicker-toggle>
+            <mat-datepicker #fromDate></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field class="dates-item" appearance="fill">
+            <input (dateInput)="formOnChange('toDate', $event.value)" matInput [matDatepicker]="toDate">
+            <mat-datepicker-toggle matIconSuffix [for]="toDate"></mat-datepicker-toggle>
+            <mat-datepicker #toDate></mat-datepicker>
+          </mat-form-field>
         </div>
       </div>
       <div class="content-item wide">
         <h3>Comment</h3>
-        <textarea name="comment" (change)="formOnChange(comment.name, comment.value)" #comment class="bordered" matInput placeholder="Add a comment..."></textarea>
+        <textarea name="comment" (change)="formOnChange(comment.name, comment.value)" #comment class="bordered" matInput
+          placeholder="Add a comment..."></textarea>
       </div>
     </div>
     <div class="footer">
