@@ -41,7 +41,9 @@
           <div class="calendar__content">
             <div [class.weekend]="day.isWeekend" [ngClass]="day.className" *ngFor="let day of calendarItem">
 
-              <div (click)="day.absence.taken ? updateAbsence(day.fullDate) : handleDialogView(true, 'requestDialog')" class="day" [class.light]="day.className!=='in-month'">
+              <div
+                (click)="day.absence.taken ? updateAbsence(day.fullDate) : handleDialogView(true, 'requestDialog',day.fullDate)"
+                class="day" [class.light]="day.className!=='in-month'">
                 {{day.day}}
                 <span [class.taken]="day.absence.taken" class="day-comment">{{day.absence.comment}}</span>
               </div>
@@ -60,7 +62,7 @@
   </div>
   <div class="absence">
     <div class="request">
-      <button (click)="handleDialogView(true, 'requestDialog')" class="request-button" mat-flat-button
+      <button (click)="handleDialogView(true, 'requestDialog', {})" class="request-button" mat-flat-button
         color="primary">Request
         absence</button>
     </div>
@@ -74,9 +76,13 @@
   </div>
 </div>
 
-<app-dialog [title]="'Request Absence'" [currentAbsence]="currentAbsence" [selectedAbsence]="selectedAbsenceType" [name]="'requestDialog'"
-  [absenceTypes]="absenceTypes" [showDialog]="showDialog">
+<app-dialog [title]="'Request Absence'" [currentAbsence]="currentAbsence" [selectedAbsence]="selectedAbsenceType"
+  [name]="'requestDialog'" [absenceTypes]="absenceTypes" [showDialog]="this.dialogService.dialogs.requestDialog">
 </app-dialog>
 <app-dialog [title]="'Absence Period'" [currentAbsence]="currentAbsence" [selectedAbsence]="selectedAbsenceType"
-  [name]="'updateDialog'" [absenceTypes]="absenceTypes" [showDialog]="updateDialog">
+  [name]="'updateDialog'" [absenceTypes]="absenceTypes" [showDialog]="this.dialogService.dialogs.updateDialog">
 </app-dialog>
+
+<div *ngFor="let absence of absences$ | async; let i = index">
+  {{absence.comment}}
+</div>

@@ -13,7 +13,6 @@ export class DialogService {
 
   currentAbsence: any = {}
 
-
   handleDialogView(state: boolean, dialog: any) {
     this.dialogs[dialog] = state;
   }

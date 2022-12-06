@@ -2,6 +2,11 @@ import { Component, DoCheck, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { DialogService } from '../../services/dialog.service';
 import { RequestService } from '../../services/request.service';
+import { Observable } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { addAbsence, getAbsences } from '../../store/absence.actions';
+import { AppState } from '../../app-state';
+
 
 interface CalendarItem {
     day: string;
@@ -21,8 +26,13 @@ export interface AbsenceItem {
 }
 
 export interface AbsenceType {
-    value: string;
+    value: AbsenceTypeEnums;
     viewValue: string;
+}
+
+const enum AbsenceTypeEnums {
+    sick = 'sick',
+    vacation = 'vacation',
 }
 
 
@@ -34,9 +44,12 @@ export interface AbsenceType {
 
 export class CalendarComponent implements OnInit, DoCheck {
 
-    constructor(private dialogService: DialogService, private requestService: RequestService) {
-        this.showDialog = dialogService.dialogs.requestDialog;
-    }
+    absences$ = this.store.pipe(select(state => state.absencesArray));
+
+    constructor(public dialogService: DialogService, private requestService: RequestService,
+        private store: Store<AppState>) {
+        console.log(this.absences$) 
+    }   
 
     date = moment();
     calendar: Array<CalendarItem[]> = [];
@@ -46,17 +59,24 @@ export class CalendarComponent implements OnInit, DoCheck {
     selectedAbsenceFilter = '';
     selectedAbsenceType = 'sick';
     absenceTypes: AbsenceType[] = [
-        { value: 'sick', viewValue: 'Sick' },
-        { value: 'vacation', viewValue: 'Vacation' }
+        { value: AbsenceTypeEnums.sick, viewValue: 'Sick' },
+        { value: AbsenceTypeEnums.vacation, viewValue: 'Vacation' }
     ];
-    showDialog = false;
-    updateDialog = true;
-
     currentAbsence = {}
 
 
     ngOnInit(): void {
         this.calendar = this.createCalendar(this.date);
+        this.store.dispatch(getAbsences());
+        this.store.dispatch(addAbsence({
+            absence: {
+                absType: 'vacation',
+                fromDate: '2022-12-07',
+                toDate: '2022-12-08',
+                comment: 'Yeah boy!',
+                taken: false,
+            }
+        }))
     }
 
     ngDoCheck() {
@@ -71,7 +91,6 @@ export class CalendarComponent implements OnInit, DoCheck {
         if (checkAbse) {
             this.requestService.absencesArray.push(this.requestService.dialogData)
         }
-        this.showDialog = this.dialogService.dialogs.requestDialog;
         this.calendar = this.createCalendar(this.date);
     }
 
@@ -80,11 +99,12 @@ export class CalendarComponent implements OnInit, DoCheck {
             || moment(fullDate).isBetween(item.fromDate, item.toDate))
         this.currentAbsence = { ...currAbs }
         this.dialogService.currentAbsence = this.currentAbsence
-        this.handleDialogView(true, 'updateDialog')
+        this.handleDialogView(true, 'updateDialog', this.currentAbsence)
         this.requestService.deleteAbsDate = fullDate;
     }
 
-    handleDialogView(state: boolean, dialog: any) {
+    handleDialogView(state: boolean, dialog: any, currentDay: any) {
+        this.currentAbsence === currentDay
         if (dialog === 'requestDialog') {
             this.currentAbsence = {}
         }

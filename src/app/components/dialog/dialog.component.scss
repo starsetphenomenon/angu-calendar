@@ -35,13 +35,7 @@
 
     .wide {
       width: 100%;
-    }
-
-    h3 {
-      margin: 0;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
+    }    
 
     textarea {
       width: 100%;
@@ -53,12 +47,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
-
-    h2 {
-      margin: 0;
-      font-weight: bold;
-    }
+    align-items: center;   
 
     .close {
       cursor: pointer;
@@ -83,4 +72,16 @@
   left: 0;
   top: 0;
   z-index: 99;
+}
+
+
+.bold-mb10 {
+  margin: 0;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.bold-m0 {
+  margin: 0;
+  font-weight: bold;
 }

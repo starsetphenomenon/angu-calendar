@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@angular/core';
+import * as moment from 'moment';
 import { AbsenceItem } from '../components/calendar/calendar.component';
 import { DialogService } from '../services/dialog.service';
 
@@ -8,9 +9,8 @@ import { DialogService } from '../services/dialog.service';
 
 export class RequestService {
 
-    constructor(@Inject(DialogService) private dialogService: DialogService) {
+    constructor(@Inject(DialogService) private dialogService: DialogService) { }
 
-    }
     dialogData: AbsenceItem = {
         absType: '',
         fromDate: '',
@@ -42,10 +42,6 @@ export class RequestService {
 
     deleteAbsDate: string = '';
 
-    setDeleteId(id: string) {
-        this.deleteAbsDate = id;
-    }
-
     updateAbsArr(data: any, currAbs: any) {
         let item = this.absencesArray.find(item => (item.fromDate === currAbs.fromDate || item.toDate === currAbs.toDate))
         this.absencesArray = [...this.absencesArray.filter(el => el !== item)]
@@ -57,7 +53,8 @@ export class RequestService {
 
     deleteAbsence() {
         let id = this.deleteAbsDate;
-        let item = this.absencesArray.find(item => (item.fromDate === id || item.toDate === id))
+        let item = this.absencesArray.find(item => (item.fromDate === id || item.toDate === id
+            || moment(id).isBetween(item.fromDate, item.toDate)))
         this.absencesArray = this.absencesArray.filter(el => el !== item)
         this.dialogService.handleDialogView(false, 'updateDialog')
     }
