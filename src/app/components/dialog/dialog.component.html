@@ -21,14 +21,14 @@
           <h3 class="bold-mb10">From - To</h3>
           <div class="dates">
             <mat-form-field class="dates-item" appearance="fill">
-              <mat-label *ngIf="currentAbsence.fromDate">{{currentAbsence.fromDate | date:'dd/MM/yyyy'}}</mat-label>
+              <mat-label *ngIf="currentAbsence.fromDate">{{currentAbsence.fromDate }}</mat-label>
               <input placeholder="DD/MM/YYYY" [max]="maxDate" formControlName="fromDate" 
                 matInput [matDatepicker]="fromDate">
               <mat-datepicker-toggle matIconSuffix [for]="fromDate"></mat-datepicker-toggle>
               <mat-datepicker #fromDate></mat-datepicker>
             </mat-form-field>
             <mat-form-field class="dates-item" appearance="fill">
-              <mat-label *ngIf="currentAbsence.toDate">{{currentAbsence.toDate | date:'dd/MM/yyyy'}}</mat-label>
+              <mat-label *ngIf="currentAbsence.toDate">{{currentAbsence.toDate }}</mat-label>
               <input placeholder="DD/MM/YYYY" [min]="minDate" formControlName="toDate" 
                 matInput [matDatepicker]="toDate">
               <mat-datepicker-toggle matIconSuffix [for]="toDate"></mat-datepicker-toggle>

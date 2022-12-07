@@ -59,7 +59,13 @@ export class CalendarComponent implements OnInit {
         { value: AbsenceTypeEnums.sick, viewValue: 'Sick' },
         { value: AbsenceTypeEnums.vacation, viewValue: 'Vacation' }
     ];
-    currentAbsence = {}
+    currentAbsence: AbsenceItem = {
+        absType: 'sick',
+        fromDate: this.absencesService.currentAbsenceID,
+        toDate: this.absencesService.currentAbsenceID,
+        comment: '',
+        taken: false,
+    }
 
     absencesArray$?: Observable<AbsenceItem[]>;
 
@@ -75,18 +81,26 @@ export class CalendarComponent implements OnInit {
 
     updateAbsence(fullDate: string) {
         this.absencesService.currentAbsenceID = fullDate;
-        let currAbs = this.absencesService.absencesArray.value.find(item => item.fromDate === fullDate || item.toDate === fullDate
+        let currentAbsence = this.absencesService.absencesArray.value.find(item => item.fromDate === fullDate || item.toDate === fullDate
             || moment(fullDate).isBetween(item.fromDate, item.toDate))
-        this.currentAbsence = { ...currAbs }
+        if (currentAbsence) {
+            this.currentAbsence = { ...currentAbsence }
+        }
         this.dialogService.currentAbsence = this.currentAbsence
         this.handleDialogView(true, 'updateDialog', fullDate)
     }
 
-    handleDialogView(state: boolean, dialog: any, currentDay: any) {        
+    handleDialogView(state: boolean, dialog: any, currentDay: any) {
         this.absencesService.currentAbsenceID = currentDay
         this.currentAbsence === currentDay
         if (dialog === 'requestDialog') {
-            this.currentAbsence = {}
+            this.currentAbsence = {
+                absType: 'sick',
+                fromDate: moment(this.absencesService.currentAbsenceID).format('DD/MM/YYYY'),
+                toDate: moment(this.absencesService.currentAbsenceID).format('DD/MM/YYYY'),
+                comment: '',
+                taken: false,
+            }
         }
         this.dialogService.handleDialogView(state, dialog)
     }

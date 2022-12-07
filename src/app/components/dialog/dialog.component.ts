@@ -15,7 +15,7 @@ export class DialogComponent implements OnInit, OnChanges {
     @Input() absenceTypes?: AbsenceType[];
     @Input() name!: string;
     @Input() showDialog!: boolean;
-    @Input() currentAbsence!: any;
+    @Input() currentAbsence!: AbsenceItem;
     @Input() title!: string;
 
     dateNow = new Date()
@@ -42,9 +42,9 @@ export class DialogComponent implements OnInit, OnChanges {
         if (changes.showDialog) {
             if (this.absenceForm) {
                 this.absenceForm.patchValue({
-                    absenceType: 'sick',
-                    fromDate: this.absencesService.currentAbsenceID,
-                    toDate: this.absencesService.currentAbsenceID,
+                    absenceType: this.currentAbsence.absType,
+                    fromDate: this.currentAbsence.fromDate,
+                    toDate: this.currentAbsence.toDate,
                     comment: '',
                 });
             }
@@ -57,7 +57,7 @@ export class DialogComponent implements OnInit, OnChanges {
         this.handleDialogView(false)
     }
 
-    handleDialogView(state: boolean) {
+    handleDialogView(state: boolean) {    
         this.dialogService.handleDialogView(state, this.name);
         this.absenceForm.patchValue({
             absenceType: this.dialogService.currentAbsence.absType,
@@ -76,5 +76,5 @@ export class DialogComponent implements OnInit, OnChanges {
         data.toDate = moment(data.toDate).format('YYYY-MM-DD')
         this.absencesService.addAbsence(data)
         this.handleDialogView(false)
-    }   
+    }
 }
