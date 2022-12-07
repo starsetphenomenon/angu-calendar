@@ -20,7 +20,6 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { absencesReducer } from './store/absence.reducers';
 
 @NgModule({
   declarations: [
@@ -43,7 +42,6 @@ import { absencesReducer } from './store/absence.reducers';
     MatNativeDateModule,
     MatFormFieldModule,
     MatInputModule,
-    StoreModule.forRoot({ absencesArray: absencesReducer }),
     StoreDevtoolsModule.instrument(),
   ],
   providers: [],

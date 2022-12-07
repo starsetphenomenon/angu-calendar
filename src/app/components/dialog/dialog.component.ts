@@ -1,17 +1,9 @@
-import { Component, Input, DoCheck, OnInit } from '@angular/core';
-import { AbsenceType } from '../calendar/calendar.component';
+import { Component, Input, DoCheck, OnInit, OnChanges } from '@angular/core';
+import { AbsenceItem, AbsenceType } from '../calendar/calendar.component';
 import { DialogService } from '../../services/dialog.service';
-import { RequestService } from '../../services/request.service';
 import * as moment from 'moment';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-
-interface absenceFormInt {
-    absenceType: string,
-    fromDate: string,
-    toDate: string,
-    comment: string,
-}
-
+import { AbsencesService } from 'src/app/services/absences.service';
 
 @Component({
     selector: 'app-dialog',
@@ -19,20 +11,18 @@ interface absenceFormInt {
     styleUrls: ['./dialog.component.scss']
 })
 
-export class DialogComponent implements OnInit {
+export class DialogComponent implements OnInit, OnChanges {
     dateNow = new Date()
     absType = '';
-    dialogData = {};
     absenceForm: FormGroup;
-    constructor(private dialogService: DialogService, private requestService: RequestService) {
-
-    }
     maxDate = null;
     minDate = null;
 
+    constructor(private dialogService: DialogService, private absencesService: AbsencesService) { }
+
     ngOnInit() {
         this.absenceForm = new FormGroup({
-            absenceType: new FormControl('vacation', Validators.required),
+            absenceType: new FormControl('sick', Validators.required),
             fromDate: new FormControl(this.dateNow, Validators.required),
             toDate: new FormControl(this.dateNow, Validators.required),
             comment: new FormControl('', Validators.required),
@@ -43,43 +33,46 @@ export class DialogComponent implements OnInit {
         })
     }
 
-    getMomentDate(date: string) {
-        return new Date(date)
+    ngOnChanges(changes: any) {
+        if (changes.showDialog) {
+            if (this.absenceForm) {
+                this.absenceForm.patchValue({
+                    absenceType: 'sick',
+                    fromDate: this.absencesService.currAbsID,
+                    toDate: this.absencesService.currAbsID,
+                    comment: '',
+                });
+            }
+        }
     }
 
-    onUpdateAbs(data: any) {
-        data.fromDate = moment(data).format('YYYY-MM-DD')
-        data.toDate = moment(data).format('YYYY-MM-DD')       
-        this.requestService.updateAbsArr(data, this.dialogService.currentAbsence)
-
+    onUpdateAbs() {
+        this.absenceForm.value.comment = this.dialogService.currentAbsence.comment
+        this.absencesService.updateAbsence(this.dialogService.currentAbsence, this.absenceForm.value)
         this.handleDialogView(false)
     }
 
-    handleDialogView(state: boolean) {    
+    handleDialogView(state: boolean) {
         this.dialogService.handleDialogView(state, this.name);
+        this.absenceForm.patchValue({
+            absenceType: this.dialogService.currentAbsence.absType,
+            fromDate: this.absencesService.currAbsID,
+            toDate: this.absencesService.currAbsID,
+        });
     }
 
     deleteAbsence() {
-        this.requestService.deleteAbsence()
-    }
-
-    onRequest(data: absenceFormInt) {
-        data.fromDate = moment(data.fromDate).format('YYYY-MM-DD')
-        data.toDate = moment(data.toDate).format('YYYY-MM-DD')  
-        this.requestService.onRequest({ ...data, taken: true })
+        this.absencesService.deleteAbsence(this.absencesService.currAbsID)
         this.handleDialogView(false)
     }
 
-
-    formOnChange(name: string, value: any) {
-        if (moment.isDate(value)) {
-            value = moment(value).format('YYYY-MM-DD')
-        }
-        this.dialogData = {
-            ...this.dialogData,
-            [name]: value
-        }
+    onRequest(data: AbsenceItem) {
+        data.fromDate = moment(data.fromDate).format('YYYY-MM-DD')
+        data.toDate = moment(data.toDate).format('YYYY-MM-DD')
+        this.absencesService.addAbsence(data)
+        this.handleDialogView(false)
     }
+
 
     @Input() absenceTypes: AbsenceType[];
     @Input() selectedAbsence: string;

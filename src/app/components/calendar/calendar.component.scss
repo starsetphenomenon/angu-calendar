@@ -102,8 +102,9 @@
     flex-direction: column;
     padding: 0;
     height: 100%;
-    padding: 5px 0;
-    overflow: hidden; 
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 
     &:hover {
       box-shadow: 0 4px 0 rgb(0, 102, 227) inset;
@@ -113,11 +114,12 @@
       display: block;
       align-self: flex-end;
       width: 100%;
-      padding: 0 5px;
-      max-width: 100px;
+      padding: 5px;
+      max-width: 100%;
       overflow: hidden;
       word-wrap: break-word;
       word-break: normal;
+      box-sizing: border-box;
     }
 
     .taken {

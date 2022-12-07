@@ -25,7 +25,7 @@
       </div>
       <mat-form-field class="filter" appearance="fill">
         <mat-label class="filter-select bolder">Filter by absence type</mat-label>
-        <mat-select [(value)]="selectedAbsenceFilter">
+        <mat-select (selectionChange)="filterByAbsence(selectedAbsenceFilter)" [(value)]="selectedAbsenceFilter">
           <mat-option *ngFor="let item of absenceTypes" [value]="item.value">
             {{item.viewValue}}
           </mat-option>
@@ -42,7 +42,7 @@
             <div [class.weekend]="day.isWeekend" [ngClass]="day.className" *ngFor="let day of calendarItem">
 
               <div
-                (click)="day.absence.taken ? updateAbsence(day.fullDate) : handleDialogView(true, 'requestDialog',day.fullDate)"
+                (click)="day.absence.taken ? updateAbsence(day.fullDate) : handleDialogView(true, 'requestDialog', day.fullDate)"
                 class="day" [class.light]="day.className!=='in-month'">
                 {{day.day}}
                 <span [class.taken]="day.absence.taken" class="day-comment">{{day.absence.comment}}</span>
@@ -83,6 +83,3 @@
   [name]="'updateDialog'" [absenceTypes]="absenceTypes" [showDialog]="this.dialogService.dialogs.updateDialog">
 </app-dialog>
 
-<div *ngFor="let absence of absences$ | async; let i = index">
-  {{absence.comment}}
-</div>
