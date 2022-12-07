@@ -25,7 +25,7 @@
       </div>
       <mat-form-field class="filter" appearance="fill">
         <mat-label class="filter-select bolder">Filter by absence type</mat-label>
-        <mat-select (selectionChange)="filterByAbsence(selectedAbsenceFilter)" [(value)]="selectedAbsenceFilter">
+        <mat-select (selectionChange)="filterByAbsence()" [(value)]="selectedAbsenceFilter">
           <mat-option *ngFor="let item of absenceTypes" [value]="item.value">
             {{item.viewValue}}
           </mat-option>
@@ -76,10 +76,10 @@
   </div>
 </div>
 
-<app-dialog [title]="'Request Absence'" [currentAbsence]="currentAbsence" [selectedAbsence]="selectedAbsenceType"
+<app-dialog [title]="'Request Absence'" [currentAbsence]="currentAbsence" 
   [name]="'requestDialog'" [absenceTypes]="absenceTypes" [showDialog]="this.dialogService.dialogs.requestDialog">
 </app-dialog>
-<app-dialog [title]="'Absence Period'" [currentAbsence]="currentAbsence" [selectedAbsence]="selectedAbsenceType"
+<app-dialog [title]="'Absence Period'" [currentAbsence]="currentAbsence" 
   [name]="'updateDialog'" [absenceTypes]="absenceTypes" [showDialog]="this.dialogService.dialogs.updateDialog">
 </app-dialog>
 

@@ -41,7 +41,7 @@ export class AbsencesService {
     }
   ])
 
-  currAbsID: string;
+  currentAbsenceID!: string;
 
   addAbsence(abs: AbsenceItem) {
     this.absencesArray.next([...this.absencesArray.value, abs])

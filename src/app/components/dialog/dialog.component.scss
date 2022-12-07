@@ -35,11 +35,8 @@
 
     .wide {
       width: 100%;
-    }    
-
-    textarea {
-      width: 100%;
-    }
+    }       
+    
   }
 
   .header {
@@ -84,4 +81,8 @@
 .bold-m0 {
   margin: 0;
   font-weight: bold;
+}
+
+.full-w {
+  width: 100%;
 }

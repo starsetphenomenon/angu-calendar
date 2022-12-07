@@ -1,4 +1,4 @@
-import { Component, DoCheck, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { DialogService } from '../../services/dialog.service';
 import { distinctUntilChanged, filter, map, Observable } from 'rxjs';
@@ -61,7 +61,7 @@ export class CalendarComponent implements OnInit {
     ];
     currentAbsence = {}
 
-    absencesArray$: Observable<AbsenceItem[]>;
+    absencesArray$?: Observable<AbsenceItem[]>;
 
 
     ngOnInit(): void {
@@ -69,12 +69,12 @@ export class CalendarComponent implements OnInit {
         this.absencesArray$.pipe(distinctUntilChanged()).subscribe(_ => this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter));
     }
 
-    filterByAbsence(type: string) {
+    filterByAbsence() {
         this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter)
     }
 
     updateAbsence(fullDate: string) {
-        this.absencesService.currAbsID = fullDate;
+        this.absencesService.currentAbsenceID = fullDate;
         let currAbs = this.absencesService.absencesArray.value.find(item => item.fromDate === fullDate || item.toDate === fullDate
             || moment(fullDate).isBetween(item.fromDate, item.toDate))
         this.currentAbsence = { ...currAbs }
@@ -82,8 +82,8 @@ export class CalendarComponent implements OnInit {
         this.handleDialogView(true, 'updateDialog', fullDate)
     }
 
-    handleDialogView(state: boolean, dialog: any, currentDay: any) {
-        this.absencesService.currAbsID = currentDay
+    handleDialogView(state: boolean, dialog: any, currentDay: any) {        
+        this.absencesService.currentAbsenceID = currentDay
         this.currentAbsence === currentDay
         if (dialog === 'requestDialog') {
             this.currentAbsence = {}

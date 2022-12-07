@@ -41,7 +41,7 @@
           <h3 class="bold-mb10" *ngIf="currentAbsence.comment">Note</h3>
           <span *ngIf="currentAbsence.comment">{{currentAbsence.comment}}</span>
           <textarea formControlName="comment" *ngIf="!currentAbsence.comment" name="comment"
-           #comment class="bordered" matInput
+           #comment class="bordered full-w" matInput
             placeholder="Add a comment..."></textarea>
         </div>
       </div>
