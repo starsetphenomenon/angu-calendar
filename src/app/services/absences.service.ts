@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AbsenceItem } from '../components/calendar/calendar.component';
 
-export interface iAvailableDays {
+export interface AvailableDays {
   sick: {
     entitlement: number,
     taken: number,
@@ -38,7 +38,7 @@ export class AbsencesService {
 
   currentAbsenceID!: string;
 
-  availableDays: BehaviorSubject<iAvailableDays> = new BehaviorSubject<iAvailableDays>({
+  availableDays: BehaviorSubject<AvailableDays> = new BehaviorSubject<AvailableDays>({
     sick: {
       entitlement: 20,
       taken: 7,
@@ -49,11 +49,11 @@ export class AbsencesService {
     },
   })
 
-  getAvailableDays(): Observable<iAvailableDays> {
+  getAvailableDays(): Observable<AvailableDays> {
     return this.availableDays.asObservable();
   }
 
-  setAvailableDays(newValue: iAvailableDays) {
+  setAvailableDays(newValue: AvailableDays) {
     this.availableDays.next(newValue);
   }
 

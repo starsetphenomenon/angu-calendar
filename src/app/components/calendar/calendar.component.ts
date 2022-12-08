@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { DialogService } from '../../services/dialog.service';
-import { distinctUntilChanged, Observable } from 'rxjs';
+import { distinctUntilChanged, Observable, Subject, takeUntil } from 'rxjs';
 import { AbsencesService } from 'src/app/services/absences.service';
-import { iAvailableDays } from 'src/app/services/absences.service';
+import { AvailableDays } from 'src/app/services/absences.service';
 
 
 
@@ -28,10 +28,10 @@ export interface AbsenceType {
     viewValue: string;
 }
 
-const enum AbsenceTypeEnums {
-    all = 'all',
-    sick = 'sick',
-    vacation = 'vacation',
+enum AbsenceTypeEnums {
+    ALL = 'all',
+    SICK = 'sick',
+    VACATION = 'vacation',
 }
 
 
@@ -41,10 +41,11 @@ const enum AbsenceTypeEnums {
     styleUrls: ['./calendar.component.scss']
 })
 
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, OnDestroy {
 
     constructor(public dialogService: DialogService, public absencesService: AbsencesService) { }
-
+    
+    destroy$: Subject<boolean> = new Subject<boolean>();
     date = moment();
     calendar: Array<CalendarItem[]> = [];
     calendarType: string = 'month';
@@ -52,10 +53,11 @@ export class CalendarComponent implements OnInit {
     weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     selectedAbsenceFilter = '';
     selectedAbsenceType = 'sick';
+    AbsenceTypeEnums = AbsenceTypeEnums;
     absenceTypes: AbsenceType[] = [
-        { value: AbsenceTypeEnums.all, viewValue: 'All' },
-        { value: AbsenceTypeEnums.sick, viewValue: 'Sick' },
-        { value: AbsenceTypeEnums.vacation, viewValue: 'Vacation' }
+        { value: AbsenceTypeEnums.ALL, viewValue: 'All' },
+        { value: AbsenceTypeEnums.SICK, viewValue: 'Sick' },
+        { value: AbsenceTypeEnums.VACATION, viewValue: 'Vacation' }
     ];
     currentAbsence: AbsenceItem = {
         absenceType: 'sick',
@@ -64,7 +66,7 @@ export class CalendarComponent implements OnInit {
         comment: '',
     }
 
-    availableDays: iAvailableDays = {
+    availableDays: AvailableDays = {
         sick: {
             entitlement: 20,
             taken: 7,
@@ -75,14 +77,19 @@ export class CalendarComponent implements OnInit {
         },
     }
 
-    absencesArray$?: Observable<AbsenceItem[]>;
+    absencesArray$?: Observable<AbsenceItem[]>;  
 
     ngOnInit(): void {
         this.absencesArray$ = this.absencesService.absencesArray;
         this.absencesService.getAvailableDays().subscribe((value) => (this.availableDays = value));
-        this.absencesArray$.pipe(distinctUntilChanged()).subscribe(_ => {
+        this.absencesArray$.pipe(takeUntil(this.destroy$)).subscribe(_ => {
             this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
         });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next(true);
+        this.destroy$.unsubscribe();
     }
 
     filterByAbsence() {
@@ -129,10 +136,10 @@ export class CalendarComponent implements OnInit {
         let vacationTakenDays = 0;
 
         absences.forEach(abs => {
-            if (abs.absenceType === 'sick') {
+            if (abs.absenceType === AbsenceTypeEnums.SICK) {
                 sickTakenDays += moment.duration(moment(abs.toDate).diff(abs.fromDate)).asDays() + 1;
             }
-            if (abs.absenceType === 'vacation') {
+            if (abs.absenceType === AbsenceTypeEnums.VACATION) {
                 vacationTakenDays += moment.duration(moment(abs.toDate).diff(abs.fromDate)).asDays() + 1;
             }
         })

@@ -8,7 +8,7 @@ import { AbsencesService } from 'src/app/services/absences.service';
 @Component({
     selector: 'app-dialog',
     templateUrl: './dialog.component.html',
-    styleUrls: ['./dialog.component.scss']
+    styleUrls: ['./dialog.component.scss'],   
 })
 
 export class DialogComponent implements OnInit, OnChanges {
@@ -55,6 +55,15 @@ export class DialogComponent implements OnInit, OnChanges {
                     toDate: this.currentAbsence.toDate,
                     comment: '',
                 });
+                if (this.dialogService.dialogs.requestDialog) {
+                   
+                    this.absenceForm.patchValue({
+                        absenceType: this.currentAbsence.absenceType,
+                        fromDate: this.absencesService.currentAbsenceID,
+                        toDate: this.absencesService.currentAbsenceID,
+                        comment: '',
+                    });
+                }
             }
         }
     }
@@ -104,7 +113,7 @@ export class DialogComponent implements OnInit, OnChanges {
         this.handleDialogView(false);
     }
 
-    changeDateFormat(value: any) {
+    changeDateFormat(value: AbsenceItem) {
         value.fromDate = moment(value.fromDate).format('YYYY-MM-DD');
         value.toDate = moment(value.toDate).format('YYYY-MM-DD');
     }
