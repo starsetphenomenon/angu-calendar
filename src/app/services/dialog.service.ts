@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { AbsenceItem } from '../components/calendar/calendar.component';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,12 @@ export class DialogService {
     updateDialog: false,
   }
 
-  currentAbsence: any = {}
+  currentAbsence: AbsenceItem = {
+    absenceType: '',
+    fromDate: '',
+    toDate: '',
+    comment: '',
+  }
 
   handleDialogView(state: boolean, dialog: any) {
     this.dialogs[dialog] = state;

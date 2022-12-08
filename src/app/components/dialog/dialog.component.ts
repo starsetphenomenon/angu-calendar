@@ -8,7 +8,7 @@ import { AbsencesService } from 'src/app/services/absences.service';
 @Component({
     selector: 'app-dialog',
     templateUrl: './dialog.component.html',
-    styleUrls: ['./dialog.component.scss'],   
+    styleUrls: ['./dialog.component.scss'],
 })
 
 export class DialogComponent implements OnInit, OnChanges {
@@ -56,7 +56,6 @@ export class DialogComponent implements OnInit, OnChanges {
                     comment: '',
                 });
                 if (this.dialogService.dialogs.requestDialog) {
-                   
                     this.absenceForm.patchValue({
                         absenceType: this.currentAbsence.absenceType,
                         fromDate: this.absencesService.currentAbsenceID,
@@ -92,7 +91,7 @@ export class DialogComponent implements OnInit, OnChanges {
     }
 
     onRequest(data: AbsenceItem) {
-        let currentAbsenceDuration = moment.duration(moment(this.absenceForm.value.toDate).diff(this.absenceForm.value.fromDate)).asDays() + 1;
+        let currentAbsenceDuration = moment.duration(moment(this.absenceForm.value.toDate).diff(this.absenceForm.value.fromDate)).asDays();
         if (currentAbsenceDuration > this.availableVacationDays) {
             this.outOfDays = true;
             return

@@ -44,9 +44,10 @@ enum AbsenceTypeEnums {
 export class CalendarComponent implements OnInit, OnDestroy {
 
     constructor(public dialogService: DialogService, public absencesService: AbsencesService) { }
-    
+
     destroy$: Subject<boolean> = new Subject<boolean>();
     date = moment();
+    dateNow = new Date();
     calendar: Array<CalendarItem[]> = [];
     calendarType: string = 'month';
     months = moment.months();
@@ -77,7 +78,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         },
     }
 
-    absencesArray$?: Observable<AbsenceItem[]>;  
+    absencesArray$?: Observable<AbsenceItem[]>;
 
     ngOnInit(): void {
         this.absencesArray$ = this.absencesService.absencesArray;
@@ -89,7 +90,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.destroy$.next(true);
-        this.destroy$.unsubscribe();   
+        this.destroy$.unsubscribe();
     }
 
     filterByAbsence() {
@@ -107,13 +108,16 @@ export class CalendarComponent implements OnInit, OnDestroy {
         this.handleDialogView(true, 'updateDialog', fullDate);
     }
 
-    handleDialogView(state: boolean, dialog: any, currentDay: any) {
-        this.absencesService.currentAbsenceID = currentDay
-        this.currentAbsence === currentDay
+    handleDialogView(state: boolean, dialog: any, currentDay: string) {
+        if (currentDay) {
+            this.absencesService.currentAbsenceID = currentDay;
+        } else {
+            this.absencesService.currentAbsenceID = moment(this.dateNow).format('YYYY-MM-DD');
+        }
         if (dialog === 'requestDialog') {
             this.currentAbsence = {
                 absenceType: 'sick',
-                fromDate: moment(this.absencesService.currentAbsenceID).format('DD/MM/YYYY'),
+                fromDate: moment(this.dateNow).format('YYYY-MM-DD').toString(),
                 toDate: moment(this.absencesService.currentAbsenceID).format('DD/MM/YYYY'),
                 comment: '',
             }
