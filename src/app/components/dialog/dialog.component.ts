@@ -22,10 +22,18 @@ export class DialogComponent implements OnInit, OnChanges {
     absenceForm!: FormGroup;
     maxDate = null;
     minDate = null;
+    isTaken = false;
+    outOfDays = false;
+    availableSickDays = 0;
+    availableVacationDays = 0;
 
     constructor(private dialogService: DialogService, private absencesService: AbsencesService) { }
 
     ngOnInit() {
+        this.absencesService.getAvailableDays().subscribe((value) => {
+            this.availableSickDays = value.sick.entitlement - value.sick.taken;
+            this.availableVacationDays = value.vacation.entitlement - value.vacation.taken;
+        });
         this.absenceForm = new FormGroup({
             absenceType: new FormControl('sick', Validators.required),
             fromDate: new FormControl(this.dateNow, Validators.required),
@@ -42,7 +50,7 @@ export class DialogComponent implements OnInit, OnChanges {
         if (changes.showDialog) {
             if (this.absenceForm) {
                 this.absenceForm.patchValue({
-                    absenceType: this.currentAbsence.absType,
+                    absenceType: this.currentAbsence.absenceType,
                     fromDate: this.currentAbsence.fromDate,
                     toDate: this.currentAbsence.toDate,
                     comment: '',
@@ -52,29 +60,52 @@ export class DialogComponent implements OnInit, OnChanges {
     }
 
     onUpdateAbs() {
-        this.absenceForm.value.comment = this.dialogService.currentAbsence.comment
-        this.absencesService.updateAbsence(this.dialogService.currentAbsence, this.absenceForm.value)
-        this.handleDialogView(false)
+        this.changeDateFormat(this.absenceForm.value);
+        this.absenceForm.value.comment = this.dialogService.currentAbsence.comment;
+        this.absencesService.updateAbsence(this.dialogService.currentAbsence, this.absenceForm.value);
+        this.handleDialogView(false);
     }
 
-    handleDialogView(state: boolean) {    
+    handleDialogView(state: boolean) {
+        this.outOfDays = false;
+        this.isTaken = false;
         this.dialogService.handleDialogView(state, this.name);
         this.absenceForm.patchValue({
-            absenceType: this.dialogService.currentAbsence.absType,
+            absenceType: this.dialogService.currentAbsence.absenceType,
             fromDate: this.absencesService.currentAbsenceID,
             toDate: this.absencesService.currentAbsenceID,
         });
     }
 
     deleteAbsence() {
-        this.absencesService.deleteAbsence(this.absencesService.currentAbsenceID)
-        this.handleDialogView(false)
+        this.absencesService.deleteAbsence(this.absencesService.currentAbsenceID);
+        this.handleDialogView(false);
     }
 
     onRequest(data: AbsenceItem) {
-        data.fromDate = moment(data.fromDate).format('YYYY-MM-DD')
-        data.toDate = moment(data.toDate).format('YYYY-MM-DD')
-        this.absencesService.addAbsence(data)
-        this.handleDialogView(false)
+        let currentAbsenceDuration = moment.duration(moment(this.absenceForm.value.toDate).diff(this.absenceForm.value.fromDate)).asDays() + 1;
+        if (currentAbsenceDuration > this.availableVacationDays) {
+            this.outOfDays = true;
+            return
+        }
+        this.isTaken = false;
+        this.outOfDays = false;
+        this.absencesService.absencesArray.value.forEach(abs => {
+            if (moment(data.fromDate).isBetween(abs.fromDate, abs.toDate) || moment(data.toDate).isBetween(abs.fromDate, abs.toDate)) {
+                this.isTaken = true;
+            }
+        })
+        if (this.isTaken) {
+            return;
+        }
+        this.isTaken = false;
+        this.changeDateFormat(data)
+        this.absencesService.addAbsence(data);
+        this.handleDialogView(false);
+    }
+
+    changeDateFormat(value: any) {
+        value.fromDate = moment(value.fromDate).format('YYYY-MM-DD');
+        value.toDate = moment(value.toDate).format('YYYY-MM-DD');
     }
 }

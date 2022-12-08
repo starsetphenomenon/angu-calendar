@@ -17,6 +17,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from "@angular/material/form-field";
+import {MatExpansionModule} from '@angular/material/expansion';
 
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -42,6 +43,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     MatNativeDateModule,
     MatFormFieldModule,
     MatInputModule,
+    MatExpansionModule,
     StoreDevtoolsModule.instrument(),
   ],
   providers: [],

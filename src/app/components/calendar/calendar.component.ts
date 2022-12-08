@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { DialogService } from '../../services/dialog.service';
-import { distinctUntilChanged, filter, map, Observable } from 'rxjs';
+import { distinctUntilChanged, Observable } from 'rxjs';
 import { AbsencesService } from 'src/app/services/absences.service';
+import { iAvailableDays } from 'src/app/services/absences.service';
 
 
 
@@ -16,11 +17,10 @@ interface CalendarItem {
 }
 
 export interface AbsenceItem {
-    absType: string,
+    absenceType: string,
     fromDate: string,
     toDate: string,
     comment: string,
-    taken: boolean,
 }
 
 export interface AbsenceType {
@@ -43,9 +43,7 @@ const enum AbsenceTypeEnums {
 
 export class CalendarComponent implements OnInit {
 
-    constructor(public dialogService: DialogService, private absencesService: AbsencesService) {
-
-    }
+    constructor(public dialogService: DialogService, public absencesService: AbsencesService) { }
 
     date = moment();
     calendar: Array<CalendarItem[]> = [];
@@ -60,19 +58,31 @@ export class CalendarComponent implements OnInit {
         { value: AbsenceTypeEnums.vacation, viewValue: 'Vacation' }
     ];
     currentAbsence: AbsenceItem = {
-        absType: 'sick',
+        absenceType: 'sick',
         fromDate: this.absencesService.currentAbsenceID,
         toDate: this.absencesService.currentAbsenceID,
         comment: '',
-        taken: false,
+    }
+
+    availableDays: iAvailableDays = {
+        sick: {
+            entitlement: 20,
+            taken: 7,
+        },
+        vacation: {
+            entitlement: 10,
+            taken: 4,
+        },
     }
 
     absencesArray$?: Observable<AbsenceItem[]>;
 
-
     ngOnInit(): void {
-        this.absencesArray$ = this.absencesService.absencesArray
-        this.absencesArray$.pipe(distinctUntilChanged()).subscribe(_ => this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter));
+        this.absencesArray$ = this.absencesService.absencesArray;
+        this.absencesService.getAvailableDays().subscribe((value) => (this.availableDays = value));
+        this.absencesArray$.pipe(distinctUntilChanged()).subscribe(_ => {
+            this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
+        });
     }
 
     filterByAbsence() {
@@ -82,12 +92,12 @@ export class CalendarComponent implements OnInit {
     updateAbsence(fullDate: string) {
         this.absencesService.currentAbsenceID = fullDate;
         let currentAbsence = this.absencesService.absencesArray.value.find(item => item.fromDate === fullDate || item.toDate === fullDate
-            || moment(fullDate).isBetween(item.fromDate, item.toDate))
+            || moment(fullDate).isBetween(item.fromDate, item.toDate));
         if (currentAbsence) {
-            this.currentAbsence = { ...currentAbsence }
+            this.currentAbsence = { ...currentAbsence };
         }
-        this.dialogService.currentAbsence = this.currentAbsence
-        this.handleDialogView(true, 'updateDialog', fullDate)
+        this.dialogService.currentAbsence = this.currentAbsence;
+        this.handleDialogView(true, 'updateDialog', fullDate);
     }
 
     handleDialogView(state: boolean, dialog: any, currentDay: any) {
@@ -95,14 +105,13 @@ export class CalendarComponent implements OnInit {
         this.currentAbsence === currentDay
         if (dialog === 'requestDialog') {
             this.currentAbsence = {
-                absType: 'sick',
+                absenceType: 'sick',
                 fromDate: moment(this.absencesService.currentAbsenceID).format('DD/MM/YYYY'),
                 toDate: moment(this.absencesService.currentAbsenceID).format('DD/MM/YYYY'),
                 comment: '',
-                taken: false,
             }
         }
-        this.dialogService.handleDialogView(state, dialog)
+        this.dialogService.handleDialogView(state, dialog);
     }
 
     setCalendarType(value: string) {
@@ -116,8 +125,30 @@ export class CalendarComponent implements OnInit {
 
     createCalendar(month: moment.Moment, filter: string) {
         let absences = this.absencesService.absencesArray.value;
+        let sickTakenDays = 0;
+        let vacationTakenDays = 0;
 
-        absences = absences.filter(abs => abs.absType !== filter)
+        absences.forEach(abs => {
+            if (abs.absenceType === 'sick') {
+                sickTakenDays += moment.duration(moment(abs.toDate).diff(abs.fromDate)).asDays() + 1;
+            }
+            if (abs.absenceType === 'vacation') {
+                vacationTakenDays += moment.duration(moment(abs.toDate).diff(abs.fromDate)).asDays() + 1;
+            }
+        })
+
+        this.absencesService.setAvailableDays({
+            sick: {
+                entitlement: this.availableDays.sick.entitlement,
+                taken: sickTakenDays,
+            },
+            vacation: {
+                entitlement: this.availableDays.vacation.entitlement,
+                taken: vacationTakenDays,
+            }
+        })
+
+        absences = absences.filter(abs => abs.absenceType !== filter);
 
         const daysInMonth = month.daysInMonth();
         const startOfMonth = month.startOf('months').format('ddd');
@@ -152,11 +183,10 @@ export class CalendarComponent implements OnInit {
             absences.forEach(abs => {
                 if (moment(curr.fullDate).isBetween(abs.fromDate, abs.toDate)) { // mark all days btw the dates
                     curr.absence = {
-                        absType: abs.absType,
+                        absenceType: abs.absenceType,
                         fromDate: abs.fromDate,
                         toDate: abs.toDate,
                         comment: abs.comment,
-                        taken: true,
                     }
                 }
             })
@@ -174,20 +204,18 @@ export class CalendarComponent implements OnInit {
     createCalendarItem(data: moment.Moment, className: string, absences: AbsenceItem[]) {
         const dayName = data.format('ddd');
         let absenceItem = {
-            absType: '',
+            absenceType: '',
             fromDate: '',
             toDate: '',
             comment: '',
-            taken: false,
         }
         absences.forEach(el => {
             if (el.fromDate === data.format('YYYY-MM-DD') || el.toDate === data.format('YYYY-MM-DD')) {
                 absenceItem = {
-                    absType: el.absType,
+                    absenceType: el.absenceType,
                     fromDate: el.fromDate,
                     toDate: el.toDate,
                     comment: el.comment,
-                    taken: true,
                 }
             }
         })

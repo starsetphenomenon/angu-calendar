@@ -42,10 +42,11 @@
             <div [class.weekend]="day.isWeekend" [ngClass]="day.className" *ngFor="let day of calendarItem">
 
               <div
-                (click)="day.absence.taken ? updateAbsence(day.fullDate) : handleDialogView(true, 'requestDialog', day.fullDate)"
-                class="day" [class.light]="day.className!=='in-month'">
+                (click)="day.absence.absenceType.length ? updateAbsence(day.fullDate) : handleDialogView(true, 'requestDialog', day.fullDate)"
+                class="day green" [class.light]="day.className!=='in-month'">
                 {{day.day}}
-                <span [class.taken]="day.absence.taken" class="day-comment">{{day.absence.comment}}</span>
+                <span [class.vacation]="day.absence.absenceType==='vacation'" [class.sick]="day.absence.absenceType==='sick'"
+                  class="day-comment">{{day.absence.comment}}</span>
               </div>
             </div>
           </div>
@@ -68,18 +69,78 @@
     </div>
     <div class="absence__types">
       <h2 class="bold">Absence types</h2>
-      <div class="vacation">
+      <div class="absence-type">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <div class="type-icon green"></div>
+              <h2 class="m-0">Vacation</h2>
+            </mat-panel-title>
+            <mat-panel-description class="bold">
+              <span class="left">{{this.availableDays.vacation.entitlement-this.availableDays.vacation.taken}} Days
+                left</span>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <h3 class="bold">Breakdown for 2022</h3>
+          <div class="vacation-desc">
+            <div class="vacation-item">
+              <span class="fw-500">
+                Entitlement
+              </span>
+              <span class="fw-500">
+                {{this.availableDays.vacation.entitlement}} days
+              </span>
+            </div>
+            <div class="vacation-item">
+              <span class="fw-500">
+                Taken
+              </span>
+              <span class="fw-500 ">
+                {{this.availableDays.vacation.taken}} days
+              </span>
+            </div>
+          </div>
+        </mat-expansion-panel>
       </div>
-      <div class="sick">
+      <div class="absence-type">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <div class="type-icon red"></div>
+              <h2 class="m-0">Sick</h2>
+            </mat-panel-title>
+            <mat-panel-description class="bold">
+              <span class="left">{{this.availableDays.sick.entitlement-this.availableDays.sick.taken}} Days left</span>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <h3 class="bold">Breakdown for 2022</h3>
+          <div class="vacation-desc">
+            <div class="vacation-item">
+              <span class="fw-500">
+                Entitlement
+              </span>
+              <span class="fw-500">
+                {{this.availableDays.sick.entitlement}} days
+              </span>
+            </div>
+            <div class="vacation-item">
+              <span class="fw-500">
+                Taken
+              </span>
+              <span class="fw-500 ">
+                {{this.availableDays.sick.taken}} days
+              </span>
+            </div>
+          </div>
+        </mat-expansion-panel>
       </div>
     </div>
   </div>
 </div>
 
-<app-dialog [title]="'Request Absence'" [currentAbsence]="currentAbsence" 
-  [name]="'requestDialog'" [absenceTypes]="absenceTypes" [showDialog]="this.dialogService.dialogs.requestDialog">
+<app-dialog [title]="'Request Absence'" [currentAbsence]="currentAbsence" [name]="'requestDialog'"
+  [absenceTypes]="absenceTypes" [showDialog]="this.dialogService.dialogs.requestDialog">
 </app-dialog>
-<app-dialog [title]="'Absence Period'" [currentAbsence]="currentAbsence" 
-  [name]="'updateDialog'" [absenceTypes]="absenceTypes" [showDialog]="this.dialogService.dialogs.updateDialog">
+<app-dialog [title]="'Absence Period'" [currentAbsence]="currentAbsence" [name]="'updateDialog'"
+  [absenceTypes]="absenceTypes" [showDialog]="this.dialogService.dialogs.updateDialog">
 </app-dialog>
-

@@ -45,12 +45,14 @@
             placeholder="Add a comment..."></textarea>
         </div>
       </div>
-      <div *ngIf="name==='updateDialog'" class="footer">
+      <div *ngIf="name==='updateDialog'" class="footer">        
         <button type="button" (click)="deleteAbsence()" color="warn" mat-flat-button>Delete Absence</button>
         <button type="button" [disabled]="!(absenceForm.dirty)" (click)="onUpdateAbs()" mat-flat-button
           color="primary">Update</button>
       </div>
       <div *ngIf="name==='requestDialog'" class="footer">
+        <div *ngIf="isTaken"  class="msg">Day(s) are already taken!</div>
+        <div *ngIf="outOfDays"  class="msg">You got less days available!</div>
         <button type="button" (click)="handleDialogView(false)" mat-flat-button>Cancel</button>
         <button [disabled]="!absenceForm.valid" mat-flat-button color="primary">Request</button>
       </div>

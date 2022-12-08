@@ -122,7 +122,12 @@
       box-sizing: border-box;
     }
 
-    .taken {
+    .vacation {
+      background: rgb(17, 148, 107);
+      color: #fff;
+    }
+
+    .sick {
       background: rgb(192, 57, 57);
       color: #fff;
     }
@@ -153,4 +158,66 @@
 
 .bolder {
   font-weight: bolder;
+}
+
+.mat-expansion-panel-header {
+  flex-direction: row-reverse;
+  gap: 30px;
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.vacation-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fw-500 {
+  font-weight: 500;
+}
+
+.mat-expansion-panel-header-title {
+  width: 120px;
+}
+
+.mat-expansion-panel-header-description {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.mat-content {
+  display: flex;
+  align-items: center;
+}
+
+.absence__types {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.type-icon {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.red {
+  background: rgb(194, 1, 1);
+}
+
+.green {
+  background: rgb(0, 183, 12);
+}
+
+.left {
+  background: rgb(182, 211, 253);
+  padding: 2px 10px;
+  border-radius: 10px;
 }

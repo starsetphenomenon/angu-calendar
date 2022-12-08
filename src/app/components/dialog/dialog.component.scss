@@ -16,12 +16,14 @@
     align-items: flex-start;
     gap: 20px;
     margin-top: 20px;
-    .dates{
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        gap: 15px;
+
+    .dates {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 15px;
     }
+
     &-item {
       margin: 10px 0;
       width: 70%;
@@ -35,8 +37,8 @@
 
     .wide {
       width: 100%;
-    }       
-    
+    }
+
   }
 
   .header {
@@ -44,7 +46,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;   
+    align-items: center;
 
     .close {
       cursor: pointer;
@@ -52,6 +54,7 @@
   }
 
   .footer {
+    position: relative;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -85,4 +88,17 @@
 
 .full-w {
   width: 100%;
+}
+
+.msg {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 70%;
+  padding: 15px 30px;
+  font-size: 19px;
+  color: #fff;
+  background: rgb(182, 41, 41);
+  border-radius: 16px;
+  z-index: 15;
 }
