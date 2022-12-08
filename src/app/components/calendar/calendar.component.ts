@@ -81,7 +81,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.absencesArray$ = this.absencesService.absencesArray;
-        this.absencesService.getAvailableDays().subscribe((value) => (this.availableDays = value));
+        this.absencesService.getAvailableDays().pipe(takeUntil(this.destroy$)).subscribe((value) => (this.availableDays = value));
         this.absencesArray$.pipe(takeUntil(this.destroy$)).subscribe(_ => {
             this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
         });
@@ -89,7 +89,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.destroy$.next(true);
-        this.destroy$.unsubscribe();
+        this.destroy$.unsubscribe();   
     }
 
     filterByAbsence() {

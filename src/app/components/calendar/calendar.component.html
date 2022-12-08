@@ -45,8 +45,8 @@
                 (click)="day.absence.absenceType.length ? updateAbsence(day.fullDate) : handleDialogView(true, 'requestDialog', day.fullDate)"
                 class="day green" [class.light]="day.className!=='in-month'">
                 {{day.day}}
-                <span [class.vacation]="day.absence.absenceType===AbsenceTypeEnums.SICK"
-                  [class.sick]="day.absence.absenceType===AbsenceTypeEnums.VACATION"
+                <span [class.vacation]="day.absence.absenceType===AbsenceTypeEnums.VACATION"
+                  [class.sick]="day.absence.absenceType===AbsenceTypeEnums.SICK"
                   class="day-comment">{{day.absence.comment}}</span>
               </div>
             </div>
