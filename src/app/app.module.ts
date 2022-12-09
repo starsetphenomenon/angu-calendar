@@ -21,6 +21,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
 
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { AbsencesService } from './services/absences.service';
+import { DialogService } from './services/dialog.service';
 
 @NgModule({
   declarations: [
@@ -46,7 +48,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     MatExpansionModule,
     StoreDevtoolsModule.instrument(),
   ],
-  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }],
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, AbsencesService, DialogService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

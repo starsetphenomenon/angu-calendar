@@ -67,7 +67,25 @@ export class DialogComponent implements OnInit, OnChanges {
         }
     }
 
-    onUpdateAbs() {
+    onUpdateAbsence() {
+        if (this.checkDaysAvailability()) {
+            return
+        }
+
+        this.isTaken = false;
+        let absencesArrayExceptCurrent = this.absencesService.absencesArray.value.filter(abs => abs.fromDate !== this.currentAbsence.fromDate)
+        absencesArrayExceptCurrent.forEach(abs => {
+            if (moment(this.absenceForm.value.fromDate).isBetween(abs.fromDate, abs.toDate)
+                || moment(this.absenceForm.value.toDate).isBetween(abs.fromDate, abs.toDate)
+                || moment(abs.toDate).isBetween(this.absenceForm.value.fromDate, this.absenceForm.value.toDate)) {
+                this.isTaken = true;
+            }
+        })
+        if (this.isTaken) {
+            return;
+        }
+        this.isTaken = false;
+
         this.changeDateFormat(this.absenceForm.value);
         this.absenceForm.value.comment = this.dialogService.currentAbsence.comment;
         this.absencesService.updateAbsence(this.dialogService.currentAbsence, this.absenceForm.value);
@@ -91,15 +109,15 @@ export class DialogComponent implements OnInit, OnChanges {
     }
 
     onRequest(data: AbsenceItem) {
-        let currentAbsenceDuration = moment.duration(moment(this.absenceForm.value.toDate).diff(this.absenceForm.value.fromDate)).asDays();
-        if (currentAbsenceDuration > this.availableVacationDays) {
-            this.outOfDays = true;
+        if (this.checkDaysAvailability()) {
             return
         }
+
         this.isTaken = false;
-        this.outOfDays = false;
         this.absencesService.absencesArray.value.forEach(abs => {
-            if (moment(data.fromDate).isBetween(abs.fromDate, abs.toDate) || moment(data.toDate).isBetween(abs.fromDate, abs.toDate)) {
+            if (moment(data.fromDate).isBetween(abs.fromDate, abs.toDate)
+                || moment(data.toDate).isBetween(abs.fromDate, abs.toDate)
+                || moment(abs.toDate).isBetween(data.fromDate, data.toDate)) {
                 this.isTaken = true;
             }
         })
@@ -115,5 +133,20 @@ export class DialogComponent implements OnInit, OnChanges {
     changeDateFormat(value: AbsenceItem) {
         value.fromDate = moment(value.fromDate).format('YYYY-MM-DD');
         value.toDate = moment(value.toDate).format('YYYY-MM-DD');
+    }
+
+    checkDaysAvailability() {
+        this.outOfDays = false;
+        let currentAbsenceDuration = moment.duration(moment(this.absenceForm.value.toDate).diff(this.absenceForm.value.fromDate)).asDays();
+        if (this.absenceForm.value.absenceType === 'sick') {
+            if (currentAbsenceDuration > this.availableSickDays) {
+                return this.outOfDays = true;
+            }
+        } else {
+            if (currentAbsenceDuration > this.availableVacationDays) {
+                return this.outOfDays = true;
+            }
+        }
+        return this.outOfDays
     }
 }
