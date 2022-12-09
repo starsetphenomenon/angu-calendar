@@ -135,6 +135,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
 
     createCalendar(month: moment.Moment, filter: string) {
+        if (filter === '') {
+            filter = 'all';
+        }
         let absences = this.absencesService.absencesArray.value;
         let sickTakenDays = 0;
         let vacationTakenDays = 0;
@@ -159,7 +162,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
             }
         })
 
-        absences = absences.filter(abs => abs.absenceType !== filter);
+        if (filter !== AbsenceTypeEnums.ALL) {
+            absences = absences.filter(abs => abs.absenceType === filter);
+        }
 
         const daysInMonth = month.daysInMonth();
         const startOfMonth = month.startOf('months').format('ddd');
