@@ -23,7 +23,7 @@
           <mat-icon class="arrow" (click)="setCurrentDate(1, 'year')">keyboard_arrow_right</mat-icon>
         </div>
       </div>
-      <mat-form-field class="filter" appearance="fill">
+      <mat-form-field class="filter" appearance="outline">
         <mat-label class="filter-select bolder">Filter by absence type</mat-label>
         <mat-select (selectionChange)="filterByAbsence()" [(value)]="selectedAbsenceFilter">
           <mat-option *ngFor="let item of absenceTypes" [value]="item.value">
