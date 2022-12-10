@@ -4,6 +4,9 @@ import { DialogService } from '../../services/dialog.service';
 import * as moment from 'moment';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AbsencesService } from 'src/app/services/absences.service';
+import { select, Store } from '@ngrx/store';
+import { map } from 'rxjs';
+import { absences } from 'src/app/store/absence.reducer';
 
 @Component({
     selector: 'app-dialog',
@@ -26,10 +29,15 @@ export class DialogComponent implements OnInit, OnChanges {
     outOfDays = false;
     availableSickDays = 0;
     availableVacationDays = 0;
-
-    constructor(private dialogService: DialogService, private absencesService: AbsencesService) { }
+    absences: AbsenceItem[] = [];
+    constructor(private dialogService: DialogService, private absencesService: AbsencesService,
+        private store: Store<{ absences: { absences: AbsenceItem[] } }>) { }
 
     ngOnInit() {
+        this.store.pipe(
+            select('absences'),
+            map((state: absences) => this.absences = state.absences)
+        );
         this.absencesService.getAvailableDays().subscribe((value) => {
             this.availableSickDays = value.sick.entitlement - value.sick.taken;
             this.availableVacationDays = value.vacation.entitlement - value.vacation.taken;
@@ -73,7 +81,7 @@ export class DialogComponent implements OnInit, OnChanges {
         }
 
         this.isTaken = false;
-        let absencesArrayExceptCurrent = this.absencesService.absencesArray.value.filter(abs => abs.fromDate !== this.currentAbsence.fromDate)
+        let absencesArrayExceptCurrent = this.absences.filter(abs => abs.fromDate !== this.currentAbsence.fromDate)
         absencesArrayExceptCurrent.forEach(abs => {
             if (moment(this.absenceForm.value.fromDate).isBetween(abs.fromDate, abs.toDate)
                 || moment(this.absenceForm.value.toDate).isBetween(abs.fromDate, abs.toDate)
@@ -114,7 +122,7 @@ export class DialogComponent implements OnInit, OnChanges {
         }
 
         this.isTaken = false;
-        this.absencesService.absencesArray.value.forEach(abs => {
+        this.absences.forEach(abs => {
             if (moment(data.fromDate).isBetween(abs.fromDate, abs.toDate)
                 || moment(data.toDate).isBetween(abs.fromDate, abs.toDate)
                 || moment(abs.toDate).isBetween(data.fromDate, data.toDate)) {
@@ -137,13 +145,17 @@ export class DialogComponent implements OnInit, OnChanges {
 
     checkDaysAvailability() {
         this.outOfDays = false;
-        let currentAbsenceDuration = moment.duration(moment(this.absenceForm.value.toDate).diff(this.absenceForm.value.fromDate)).asDays();
+        let currentAbsenceDuration = moment.duration(moment(this.currentAbsence.toDate).diff(this.currentAbsence.fromDate)).asDays();
+        let currentFormDuration = moment.duration(moment(this.absenceForm.value.toDate).diff(this.absenceForm.value.fromDate)).asDays() + 1;
+        if (this.dialogService.dialogs.updateDialog) {
+            currentFormDuration = currentFormDuration - currentAbsenceDuration;
+        }
         if (this.absenceForm.value.absenceType === 'sick') {
-            if (currentAbsenceDuration > this.availableSickDays) {
+            if (currentFormDuration > this.availableSickDays) {
                 return this.outOfDays = true;
             }
         } else {
-            if (currentAbsenceDuration > this.availableVacationDays) {
+            if (currentFormDuration > this.availableVacationDays) {
                 return this.outOfDays = true;
             }
         }

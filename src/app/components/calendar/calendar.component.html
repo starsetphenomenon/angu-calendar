@@ -44,7 +44,7 @@
               <div
                 (click)="day.absence.absenceType.length ? updateAbsence(day.fullDate) : handleDialogView(true, 'requestDialog', day.fullDate)"
                 class="day green" [class.light]="day.className!=='in-month'">
-                {{day.day}}
+                <div class="day-val">{{day.day}}</div>
                 <span [class.vacation]="day.absence.absenceType===AbsenceTypeEnums.VACATION"
                   [class.sick]="day.absence.absenceType===AbsenceTypeEnums.SICK"
                   class="day-comment">{{day.absence.comment}}</span>
@@ -145,3 +145,5 @@
 <app-dialog [title]="'Absence Period'" [currentAbsence]="currentAbsence" name="updateDialog"
   [absenceTypes]="absenceTypes" [showDialog]="dialogService.dialogs.updateDialog">
 </app-dialog>
+
+

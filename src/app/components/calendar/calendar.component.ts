@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { DialogService } from '../../services/dialog.service';
-import { distinctUntilChanged, Observable, Subject, takeUntil } from 'rxjs';
+import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { AbsencesService } from 'src/app/services/absences.service';
 import { AvailableDays } from 'src/app/services/absences.service';
+import { select, Store } from '@ngrx/store';
+import { absences } from 'src/app/store/absence.reducer';
 
 
 
@@ -43,7 +45,10 @@ enum AbsenceTypeEnums {
 
 export class CalendarComponent implements OnInit, OnDestroy {
 
-    constructor(public dialogService: DialogService, public absencesService: AbsencesService) { }
+    constructor(public dialogService: DialogService, public absencesService: AbsencesService,
+        private store: Store<{ absences: { absences: AbsenceItem[] } }>) { }
+
+    test$!: Observable<AbsenceItem[]>;
 
     destroy$: Subject<boolean> = new Subject<boolean>();
     date = moment();
@@ -78,14 +83,22 @@ export class CalendarComponent implements OnInit, OnDestroy {
         },
     }
 
+    absences: AbsenceItem[] = []
     absencesArray$?: Observable<AbsenceItem[]>;
 
     ngOnInit(): void {
-        this.absencesArray$ = this.absencesService.absencesArray;
-        this.absencesService.getAvailableDays().pipe(takeUntil(this.destroy$)).subscribe((value) => (this.availableDays = value));
+        this.absencesArray$ = this.store.pipe(
+            select('absences'),
+            map((state: absences) => this.absences = state.absences)
+        );
         this.absencesArray$.pipe(takeUntil(this.destroy$)).subscribe(_ => {
             this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
         });
+        /*  this.absencesArray$ = this.absencesService.absencesArray;
+         this.absencesArray$.pipe(takeUntil(this.destroy$)).subscribe(_ => {
+             this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
+         });  */
+        this.absencesService.getAvailableDays().pipe(takeUntil(this.destroy$)).subscribe((value) => (this.availableDays = value));
     }
 
     ngOnDestroy(): void {
@@ -99,7 +112,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     updateAbsence(fullDate: string) {
         this.absencesService.currentAbsenceID = fullDate;
-        let currentAbsence = this.absencesService.absencesArray.value.find(item => item.fromDate === fullDate || item.toDate === fullDate
+        let currentAbsence = this.absences.find(item => item.fromDate === fullDate || item.toDate === fullDate
             || moment(fullDate).isBetween(item.fromDate, item.toDate));
         if (currentAbsence) {
             this.currentAbsence = { ...currentAbsence };
@@ -138,7 +151,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         if (filter === '') {
             filter = 'all';
         }
-        let absences = this.absencesService.absencesArray.value;
+        let absences = this.absences;
         let sickTakenDays = 0;
         let vacationTakenDays = 0;
 

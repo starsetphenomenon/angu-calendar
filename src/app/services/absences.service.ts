@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import * as moment from 'moment';
+import { Store } from '@ngrx/store';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AbsenceItem } from '../components/calendar/calendar.component';
+import { addAbsence, deleteAbsence, updateAbsence } from '../store/absence.actions';
 
 export interface AvailableDays {
   sick: {
@@ -19,22 +20,7 @@ export interface AvailableDays {
 })
 export class AbsencesService {
 
-  constructor() { }
-
-  absencesArray: BehaviorSubject<AbsenceItem[]> = new BehaviorSubject<AbsenceItem[]>([
-    {
-      absenceType: 'sick',
-      fromDate: '2022-12-05',
-      toDate: '2022-12-08',
-      comment: 'I am sick now...',
-    },
-    {
-      absenceType: 'vacation',
-      fromDate: '2022-12-13',
-      toDate: '2022-12-17',
-      comment: 'Free man',
-    }
-  ])
+  constructor(private store: Store<{ absences: { absences: AbsenceItem[] } }>) { }
 
   currentAbsenceID!: string;
 
@@ -58,20 +44,15 @@ export class AbsencesService {
   }
 
   addAbsence(abs: AbsenceItem) {
-    this.absencesArray.next([...this.absencesArray.value, abs]);
+    this.store.dispatch(addAbsence({ payload: abs }))
   }
 
   deleteAbsence(id: string) {
-    let item = this.absencesArray.value.find(item => (item.fromDate === id || item.toDate === id
-      || moment(id).isBetween(item.fromDate, item.toDate)));
-    this.absencesArray.next(this.absencesArray.value.filter(el => el !== item));
+    this.store.dispatch(deleteAbsence({ payload: id }))
   }
 
   updateAbsence(absence: AbsenceItem, newAbsence: AbsenceItem) {
-    let item = this.absencesArray.value.find(item => (item.fromDate === absence.fromDate || item.toDate === absence.toDate));
-    if (item) {
-      this.absencesArray.next([...this.absencesArray.value.filter(el => el !== item), newAbsence]);
-    }
+    this.store.dispatch(updateAbsence({ payload: { oldAbsence: absence, newAbsence: newAbsence } }))
   }
 
 

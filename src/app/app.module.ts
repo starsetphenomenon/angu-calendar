@@ -23,6 +23,7 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AbsencesService } from './services/absences.service';
 import { DialogService } from './services/dialog.service';
+import { absenceReducer } from './store/absence.reducer';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { DialogService } from './services/dialog.service';
     MatFormFieldModule,
     MatInputModule,
     MatExpansionModule,
+    StoreModule.forRoot({ absences: absenceReducer }),
     StoreDevtoolsModule.instrument(),
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, AbsencesService, DialogService],
