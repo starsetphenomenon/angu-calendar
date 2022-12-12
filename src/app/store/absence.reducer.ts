@@ -1,18 +1,42 @@
 import { createReducer, on } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
-import { addAbsence, deleteAbsence, updateAbsence } from './absence.actions';
-import * as moment from 'moment';
+import { addAbsence, deleteAbsence, setAvailableDays, updateAbsence } from './absence.actions';
 
-export interface absences {
-    absences: AbsenceItem[],
+export interface AvailableDays {
+    sick: {
+        entitlement: number,
+        taken: number,
+    },
+    vacation: {
+        entitlement: number,
+        taken: number,
+    },
 }
-const initialState: absences = {
+
+export interface AppState {
+    absences: AbsenceItem[],
+    availableDays: AvailableDays,
+}
+
+const initialState: AppState = {
+    availableDays: {
+        sick: {
+            entitlement: 20,
+            taken: 7,
+        },
+        vacation: {
+            entitlement: 10,
+            taken: 4,
+        },
+    },
     absences: [{
+        id: 1,
         absenceType: 'sick',
         fromDate: '2022-12-17',
         toDate: '2022-12-21',
         comment: 'I am SICK!',
     }, {
+        id: 2,
         absenceType: 'vacation',
         fromDate: '2022-12-02',
         toDate: '2022-12-07',
@@ -25,24 +49,26 @@ export const absenceReducer = createReducer(
     on(addAbsence, (state, action) => {
         return {
             ...state,
-            absences: [...state.absences, action.payload],
+            absences: [...state.absences, { ...action, id: state.absences.length + 1 }],
         };
     }),
     on(deleteAbsence, (state, action) => {
-        let item = state.absences.find(item => (item.fromDate === action.payload || item.toDate === action.payload
-            || moment(action.payload).isBetween(item.fromDate, item.toDate)));
         return {
             ...state,
-            absences: [...state.absences.filter(el => el !== item)],
+            absences: [...state.absences.filter(el => el.id !== action.payload)],
         };
     }),
     on(updateAbsence, (state, action) => {
-        let item = state.absences.find(item => (item.fromDate === action.payload.oldAbsence.fromDate
-            || item.toDate === action.payload.oldAbsence.toDate));
-        let newAbsences = [...state.absences.filter(el => el !== item)]
+        let newAbsences = [...state.absences.filter(el => el.id !== action.oldAbsenceId)]
         return {
             ...state,
-            absences: [...newAbsences, action.payload.newAbsence],
+            absences: [...newAbsences, action.newAbsence],
+        };
+    }),
+    on(setAvailableDays, (state, action) => {
+        return {
+            ...state,
+            availableDays: action,
         };
     }),
 );

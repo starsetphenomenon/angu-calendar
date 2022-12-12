@@ -47,7 +47,7 @@ import { absenceReducer } from './store/absence.reducer';
     MatFormFieldModule,
     MatInputModule,
     MatExpansionModule,
-    StoreModule.forRoot({ absences: absenceReducer }),
+    StoreModule.forRoot({ AppState: absenceReducer }),
     StoreDevtoolsModule.instrument(),
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, AbsencesService, DialogService],

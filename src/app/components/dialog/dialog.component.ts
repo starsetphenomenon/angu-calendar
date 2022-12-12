@@ -1,12 +1,17 @@
-import { Component, Input, OnInit, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, OnDestroy } from '@angular/core';
 import { AbsenceItem, AbsenceType } from '../calendar/calendar.component';
 import { DialogService } from '../../services/dialog.service';
 import * as moment from 'moment';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AbsencesService } from 'src/app/services/absences.service';
 import { select, Store } from '@ngrx/store';
-import { map } from 'rxjs';
-import { absences } from 'src/app/store/absence.reducer';
+import { map, Subject, takeUntil } from 'rxjs';
+import { AppState } from 'src/app/store/absence.reducer';
+
+interface AvailableDays {
+    sick: number,
+    vacation: number,
+}
 
 @Component({
     selector: 'app-dialog',
@@ -14,44 +19,58 @@ import { absences } from 'src/app/store/absence.reducer';
     styleUrls: ['./dialog.component.scss'],
 })
 
-export class DialogComponent implements OnInit, OnChanges {
+export class DialogComponent implements OnInit, OnChanges, OnDestroy {
     @Input() absenceTypes?: AbsenceType[];
     @Input() name!: string;
     @Input() showDialog!: boolean;
     @Input() currentAbsence!: AbsenceItem;
     @Input() title!: string;
 
+    destroy$: Subject<boolean> = new Subject<boolean>();
     dateNow = new Date()
     absenceForm!: FormGroup;
     maxDate = null;
     minDate = null;
     isTaken = false;
     outOfDays = false;
-    availableSickDays = 0;
-    availableVacationDays = 0;
+    availableDays: AvailableDays = {
+        sick: 0,
+        vacation: 0,
+    }
     absences: AbsenceItem[] = [];
+
     constructor(private dialogService: DialogService, private absencesService: AbsencesService,
-        private store: Store<{ absences: { absences: AbsenceItem[] } }>) { }
+        private store: Store<{ AppState: AppState }>) {
+        this.store.select(store => store.AppState.availableDays).pipe(takeUntil(this.destroy$)).subscribe(value => {
+            Object.keys(this.availableDays).
+                forEach(key => this.availableDays[key as keyof AvailableDays] =
+                    value[key as keyof AvailableDays].entitlement - value[key as keyof AvailableDays].taken);
+        })
+    }
 
     ngOnInit() {
         this.store.pipe(
-            select('absences'),
-            map((state: absences) => this.absences = state.absences)
-        );
-        this.absencesService.getAvailableDays().subscribe((value) => {
-            this.availableSickDays = value.sick.entitlement - value.sick.taken;
-            this.availableVacationDays = value.vacation.entitlement - value.vacation.taken;
-        });
+            select('AppState'),
+            map((state: AppState) => state.absences),
+            takeUntil(this.destroy$)
+        ).subscribe(absences => this.absences = absences);
+
         this.absenceForm = new FormGroup({
             absenceType: new FormControl('sick', Validators.required),
             fromDate: new FormControl(this.dateNow, Validators.required),
             toDate: new FormControl(this.dateNow, Validators.required),
             comment: new FormControl('', Validators.required),
         })
-        this.absenceForm.valueChanges.subscribe(selectedValue => {
+
+        this.absenceForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(selectedValue => {
             this.maxDate = selectedValue.toDate;
             this.minDate = selectedValue.fromDate;
         })
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next(true);
+        this.destroy$.unsubscribe();
     }
 
     ngOnChanges(changes: any) {
@@ -66,8 +85,8 @@ export class DialogComponent implements OnInit, OnChanges {
                 if (this.dialogService.dialogs.requestDialog) {
                     this.absenceForm.patchValue({
                         absenceType: this.currentAbsence.absenceType,
-                        fromDate: this.absencesService.currentAbsenceID,
-                        toDate: this.absencesService.currentAbsenceID,
+                        fromDate: this.absencesService.currentAbsenceDate,
+                        toDate: this.absencesService.currentAbsenceDate,
                         comment: '',
                     });
                 }
@@ -77,15 +96,16 @@ export class DialogComponent implements OnInit, OnChanges {
 
     onUpdateAbsence() {
         if (this.checkDaysAvailability()) {
-            return
+            this.outOfDays = true;
+            return;
         }
 
         this.isTaken = false;
         let absencesArrayExceptCurrent = this.absences.filter(abs => abs.fromDate !== this.currentAbsence.fromDate)
-        absencesArrayExceptCurrent.forEach(abs => {
-            if (moment(this.absenceForm.value.fromDate).isBetween(abs.fromDate, abs.toDate)
-                || moment(this.absenceForm.value.toDate).isBetween(abs.fromDate, abs.toDate)
-                || moment(abs.toDate).isBetween(this.absenceForm.value.fromDate, this.absenceForm.value.toDate)) {
+        absencesArrayExceptCurrent.forEach(absence => {
+            if (moment(this.absenceForm.value.fromDate).isBetween(absence.fromDate, absence.toDate)
+                || moment(this.absenceForm.value.toDate).isBetween(absence.fromDate, absence.toDate)
+                || moment(absence.toDate).isBetween(this.absenceForm.value.fromDate, this.absenceForm.value.toDate)) {
                 this.isTaken = true;
             }
         })
@@ -96,7 +116,7 @@ export class DialogComponent implements OnInit, OnChanges {
 
         this.changeDateFormat(this.absenceForm.value);
         this.absenceForm.value.comment = this.dialogService.currentAbsence.comment;
-        this.absencesService.updateAbsence(this.dialogService.currentAbsence, this.absenceForm.value);
+        this.absencesService.updateAbsence(this.absencesService.currentAbsenceID, this.absenceForm.value);
         this.handleDialogView(false);
     }
 
@@ -106,8 +126,8 @@ export class DialogComponent implements OnInit, OnChanges {
         this.dialogService.handleDialogView(state, this.name);
         this.absenceForm.patchValue({
             absenceType: this.dialogService.currentAbsence.absenceType,
-            fromDate: this.absencesService.currentAbsenceID,
-            toDate: this.absencesService.currentAbsenceID,
+            fromDate: this.absencesService.currentAbsenceDate,
+            toDate: this.absencesService.currentAbsenceDate,
         });
     }
 
@@ -118,14 +138,15 @@ export class DialogComponent implements OnInit, OnChanges {
 
     onRequest(data: AbsenceItem) {
         if (this.checkDaysAvailability()) {
+            this.outOfDays = true;
             return
         }
 
         this.isTaken = false;
-        this.absences.forEach(abs => {
-            if (moment(data.fromDate).isBetween(abs.fromDate, abs.toDate)
-                || moment(data.toDate).isBetween(abs.fromDate, abs.toDate)
-                || moment(abs.toDate).isBetween(data.fromDate, data.toDate)) {
+        this.absences.forEach(absence => {
+            if (moment(data.fromDate).isBetween(absence.fromDate, absence.toDate)
+                || moment(data.toDate).isBetween(absence.fromDate, absence.toDate)
+                || moment(absence.toDate).isBetween(data.fromDate, data.toDate)) {
                 this.isTaken = true;
             }
         })
@@ -143,22 +164,12 @@ export class DialogComponent implements OnInit, OnChanges {
         value.toDate = moment(value.toDate).format('YYYY-MM-DD');
     }
 
-    checkDaysAvailability() {
-        this.outOfDays = false;
-        let currentAbsenceDuration = moment.duration(moment(this.currentAbsence.toDate).diff(this.currentAbsence.fromDate)).asDays();
+    checkDaysAvailability(): boolean {
+        let currentAbsenceDuration = moment.duration(moment(this.currentAbsence.toDate).diff(this.currentAbsence.fromDate)).asDays() + 1;
         let currentFormDuration = moment.duration(moment(this.absenceForm.value.toDate).diff(this.absenceForm.value.fromDate)).asDays() + 1;
         if (this.dialogService.dialogs.updateDialog) {
             currentFormDuration = currentFormDuration - currentAbsenceDuration;
         }
-        if (this.absenceForm.value.absenceType === 'sick') {
-            if (currentFormDuration > this.availableSickDays) {
-                return this.outOfDays = true;
-            }
-        } else {
-            if (currentFormDuration > this.availableVacationDays) {
-                return this.outOfDays = true;
-            }
-        }
-        return this.outOfDays
+        return currentFormDuration > this.availableDays[this.absenceForm.value.absenceType as keyof AvailableDays];
     }
 }

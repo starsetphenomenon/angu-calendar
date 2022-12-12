@@ -13,6 +13,7 @@ export class DialogService {
   }
 
   currentAbsence: AbsenceItem = {
+    id: 0,
     absenceType: '',
     fromDate: '',
     toDate: '',

@@ -42,7 +42,7 @@
             <div [class.weekend]="day.isWeekend" [ngClass]="day.className" *ngFor="let day of calendarItem">
 
               <div
-                (click)="day.absence.absenceType.length ? updateAbsence(day.fullDate) : handleDialogView(true, 'requestDialog', day.fullDate)"
+                (click)="day.absence.absenceType.length ? updateAbsence(day.fullDate, day.absence.id) : handleDialogView(true, 'requestDialog', day.fullDate)"
                 class="day green" [class.light]="day.className!=='in-month'">
                 <div class="day-val">{{day.day}}</div>
                 <span [class.vacation]="day.absence.absenceType===AbsenceTypeEnums.VACATION"

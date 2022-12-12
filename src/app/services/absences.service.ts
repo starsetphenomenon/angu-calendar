@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AbsenceItem } from '../components/calendar/calendar.component';
 import { addAbsence, deleteAbsence, updateAbsence } from '../store/absence.actions';
+import { AppState } from '../store/absence.reducer';
 
 export interface AvailableDays {
   sick: {
@@ -20,9 +21,10 @@ export interface AvailableDays {
 })
 export class AbsencesService {
 
-  constructor(private store: Store<{ absences: { absences: AbsenceItem[] } }>) { }
+  constructor(private store: Store<AppState>) { }
 
-  currentAbsenceID!: string;
+  currentAbsenceDate!: string;
+  currentAbsenceID!: number;
 
   availableDays: BehaviorSubject<AvailableDays> = new BehaviorSubject<AvailableDays>({
     sick: {
@@ -43,16 +45,16 @@ export class AbsencesService {
     this.availableDays.next(newValue);
   }
 
-  addAbsence(abs: AbsenceItem) {
-    this.store.dispatch(addAbsence({ payload: abs }))
+  addAbsence(absence: AbsenceItem) {
+    this.store.dispatch(addAbsence(absence))
   }
 
-  deleteAbsence(id: string) {
+  deleteAbsence(id: number) {
     this.store.dispatch(deleteAbsence({ payload: id }))
   }
 
-  updateAbsence(absence: AbsenceItem, newAbsence: AbsenceItem) {
-    this.store.dispatch(updateAbsence({ payload: { oldAbsence: absence, newAbsence: newAbsence } }))
+  updateAbsence(id: number, newAbsence: AbsenceItem) {
+    this.store.dispatch(updateAbsence({ oldAbsenceId: id, newAbsence: newAbsence }))
   }
 
 
