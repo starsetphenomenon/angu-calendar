@@ -20,4 +20,14 @@ export const updateAbsence = createAction(
 export const setAvailableDays = createAction(
     '[Available Days] Update Available Days',
     props<AvailableDays>()
-)
+);
+
+export const handleDialogView = createAction(
+    '[Dialogs] Handle Dialogs',
+    props<{ state: boolean, dialog: string }>()
+);
+
+export const setCurrentAbsence = createAction(
+    '[Absences] Set Current Absence',
+    props<AbsenceItem>()
+);

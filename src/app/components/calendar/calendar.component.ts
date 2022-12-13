@@ -1,12 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as moment from 'moment';
-import { DialogService } from '../../services/dialog.service';
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { AbsencesService } from 'src/app/services/absences.service';
-import { AvailableDays } from 'src/app/services/absences.service';
-import { select, Store } from '@ngrx/store';
-import { AppState } from 'src/app/store/absence.reducer';
-import { setAvailableDays } from 'src/app/store/absence.actions';
+import { Store } from '@ngrx/store';
+import { AppState, AvailableDays, Dialogs } from 'src/app/store/absence.reducer';
+import { handleDialogView, setAvailableDays, setCurrentAbsence } from 'src/app/store/absence.actions';
 
 
 
@@ -80,13 +78,16 @@ export class CalendarComponent implements OnInit, OnDestroy {
             taken: 0,
         },
     }
-
+    dialogs: Dialogs = {
+        requestDialog: false,
+        updateDialog: false,
+    }
     absences: AbsenceItem[] = []
     absencesArray$?: Observable<AbsenceItem[]>;
     availableDays$?: Observable<AvailableDays>;
 
-    constructor(public dialogService: DialogService, public absencesService: AbsencesService,
-        private store: Store<{ AppState: AppState }>) {
+    constructor(public absencesService: AbsencesService, private store: Store<{ AppState: AppState }>) {
+        this.store.select(store => store.AppState.dialogs).pipe(takeUntil(this.destroy$)).subscribe(value => this.dialogs = value)
         this.availableDays$ = this.store.select(store => store.AppState.availableDays);
         this.availableDays$.pipe(takeUntil(this.destroy$)).subscribe(availableDays => {
             this.availableDays = availableDays;
@@ -107,7 +108,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
 
     filterByAbsence() {
-        this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter)
+        this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
     }
 
     updateAbsence(fullDate: string, id: number) {
@@ -117,7 +118,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         if (currentAbsence) {
             this.currentAbsence = { ...currentAbsence };
         }
-        this.dialogService.currentAbsence = this.currentAbsence;
+        this.store.dispatch(setCurrentAbsence(this.currentAbsence));
         this.handleDialogView(true, 'updateDialog', fullDate);
     }
 
@@ -128,15 +129,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
             this.absencesService.currentAbsenceDate = moment(this.dateNow).format('YYYY-MM-DD');
         }
         if (dialog === 'requestDialog') {
-            this.currentAbsence = {
+            this.store.dispatch(setCurrentAbsence({
                 id: Date.now(),
                 absenceType: 'vacation',
                 fromDate: moment(this.dateNow).format('YYYY-MM-DD').toString(),
                 toDate: moment(this.absencesService.currentAbsenceDate).format('DD/MM/YYYY'),
                 comment: '',
-            }
+            }));
         }
-        this.dialogService.handleDialogView(state, dialog);
+        this.store.dispatch(handleDialogView({ state: state, dialog: dialog }))
     }
 
     setCalendarType(value: string) {

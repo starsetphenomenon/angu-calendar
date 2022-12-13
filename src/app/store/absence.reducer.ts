@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
-import { addAbsence, deleteAbsence, setAvailableDays, updateAbsence } from './absence.actions';
+import { addAbsence, deleteAbsence, handleDialogView, setAvailableDays, setCurrentAbsence, updateAbsence } from './absence.actions';
 
 export interface AvailableDays {
     sick: {
@@ -13,9 +13,16 @@ export interface AvailableDays {
     },
 }
 
+export interface Dialogs {
+    requestDialog: boolean,
+    updateDialog: boolean,
+}
+
 export interface AppState {
     absences: AbsenceItem[],
     availableDays: AvailableDays,
+    dialogs: Dialogs,
+    currentAbsence: AbsenceItem,
 }
 
 const initialState: AppState = {
@@ -41,7 +48,18 @@ const initialState: AppState = {
         fromDate: '2022-12-02',
         toDate: '2022-12-07',
         comment: 'Yuppi, freedom...',
-    }]
+    }],
+    dialogs: {
+        requestDialog: false,
+        updateDialog: false,
+    },
+    currentAbsence: {
+        id: 0,
+        absenceType: '',
+        fromDate: '',
+        toDate: '',
+        comment: '',
+    }
 }
 
 export const absenceReducer = createReducer(
@@ -69,6 +87,18 @@ export const absenceReducer = createReducer(
         return {
             ...state,
             availableDays: action,
+        };
+    }),
+    on(handleDialogView, (state, action) => {
+        return {
+            ...state,
+            dialogs: { ...state.dialogs, [action.dialog]: action.state },
+        };
+    }),
+    on(setCurrentAbsence, (state, action) => {
+        return {
+            ...state,
+            currentAbsence: action,
         };
     }),
 );
