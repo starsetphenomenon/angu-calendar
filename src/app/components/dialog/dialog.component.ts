@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { AbsenceItem, AbsenceType } from '../calendar/calendar.component';
 import * as moment from 'moment';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -6,7 +6,6 @@ import { AbsencesService } from 'src/app/services/absences.service';
 import { select, Store } from '@ngrx/store';
 import { map, Subject, takeUntil } from 'rxjs';
 import { AppState, Dialogs } from 'src/app/store/absence.reducer';
-import { handleDialogView } from 'src/app/store/absence.actions';
 
 interface AvailableDays {
     sick: number,
@@ -25,6 +24,9 @@ export class DialogComponent implements OnInit, OnChanges, OnDestroy {
     @Input() showDialog!: boolean;
     @Input() currentAbsence!: AbsenceItem;
     @Input() title!: string;
+    @Input() dialogs!: Dialogs;
+
+    @Output() closeDialog = new EventEmitter<Dialogs>()
 
     destroy$: Subject<boolean> = new Subject<boolean>();
     dateNow = new Date()
@@ -38,25 +40,19 @@ export class DialogComponent implements OnInit, OnChanges, OnDestroy {
         vacation: 0,
     }
     absences: AbsenceItem[] = [];
-    dialogs: Dialogs = {
-        requestDialog: false,
-        updateDialog: false,
-    }
 
 
-    constructor(private absencesService: AbsencesService, private store: Store<{ AppState: AppState }>) {
-        this.store.select(store => store.AppState.currentAbsence).pipe(takeUntil(this.destroy$)).subscribe(value => this.currentAbsence = value)
-        this.store.select(store => store.AppState.dialogs).pipe(takeUntil(this.destroy$)).subscribe(value => this.dialogs = value)
-        this.store.select(store => store.AppState.availableDays).pipe(takeUntil(this.destroy$)).subscribe(value => {
+
+    constructor(private absencesService: AbsencesService, private store: Store<{ appState: AppState }>) { }
+
+    ngOnInit() {
+        this.store.select(store => store.appState.availableDays).pipe(takeUntil(this.destroy$)).subscribe(value => {
             Object.keys(this.availableDays).
                 forEach(key => this.availableDays[key as keyof AvailableDays] =
                     value[key as keyof AvailableDays].entitlement - value[key as keyof AvailableDays].taken);
         })
-    }
-
-    ngOnInit() {
         this.store.pipe(
-            select('AppState'),
+            select('appState'),
             map((state: AppState) => state.absences),
             takeUntil(this.destroy$)
         ).subscribe(absences => this.absences = absences);
@@ -121,7 +117,7 @@ export class DialogComponent implements OnInit, OnChanges, OnDestroy {
     handleDialogView(state: boolean) {
         this.outOfDays = false;
         this.isTaken = false;
-        this.store.dispatch(handleDialogView({ state: state, dialog: this.name }));
+        this.closeDialog.emit({ ...this.dialogs, [this.name]: state })
         this.absenceForm.patchValue({
             absenceType: this.currentAbsence.absenceType,
             fromDate: this.absencesService.currentAbsenceDate,

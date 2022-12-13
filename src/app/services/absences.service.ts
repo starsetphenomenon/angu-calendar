@@ -25,7 +25,7 @@ export class AbsencesService {
   }
 
   updateAbsence(id: number, newAbsence: AbsenceItem) {
-    this.store.dispatch(updateAbsence({ oldAbsenceId: id, newAbsence: newAbsence }))
+    this.store.dispatch(updateAbsence({ absenceId: id, newAbsence: newAbsence }))
   }
 
 

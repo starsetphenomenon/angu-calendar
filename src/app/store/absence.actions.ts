@@ -14,20 +14,10 @@ export const deleteAbsence = createAction(
 
 export const updateAbsence = createAction(
     '[Absences] Update Absence',
-    props<{ oldAbsenceId: number, newAbsence: AbsenceItem }>()
+    props<{ absenceId: number, newAbsence: AbsenceItem }>()
 );
 
 export const setAvailableDays = createAction(
     '[Available Days] Update Available Days',
     props<AvailableDays>()
-);
-
-export const handleDialogView = createAction(
-    '[Dialogs] Handle Dialogs',
-    props<{ state: boolean, dialog: string }>()
-);
-
-export const setCurrentAbsence = createAction(
-    '[Absences] Set Current Absence',
-    props<AbsenceItem>()
 );

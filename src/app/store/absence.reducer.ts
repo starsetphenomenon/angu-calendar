@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
-import { addAbsence, deleteAbsence, handleDialogView, setAvailableDays, setCurrentAbsence, updateAbsence } from './absence.actions';
+import { addAbsence, deleteAbsence, setAvailableDays, updateAbsence } from './absence.actions';
 
 export interface AvailableDays {
     sick: {
@@ -21,8 +21,6 @@ export interface Dialogs {
 export interface AppState {
     absences: AbsenceItem[],
     availableDays: AvailableDays,
-    dialogs: Dialogs,
-    currentAbsence: AbsenceItem,
 }
 
 const initialState: AppState = {
@@ -49,22 +47,11 @@ const initialState: AppState = {
         toDate: '2022-12-07',
         comment: 'Yuppi, freedom...',
     }],
-    dialogs: {
-        requestDialog: false,
-        updateDialog: false,
-    },
-    currentAbsence: {
-        id: 0,
-        absenceType: '',
-        fromDate: '',
-        toDate: '',
-        comment: '',
-    }
 }
 
 export const absenceReducer = createReducer(
     initialState,
-    on(addAbsence, (state, action) => {
+    on(addAbsence, (state, action: AbsenceItem) => {
         return {
             ...state,
             absences: [...state.absences, { ...action, id: state.absences.length + 1 }],
@@ -77,28 +64,17 @@ export const absenceReducer = createReducer(
         };
     }),
     on(updateAbsence, (state, action) => {
-        let newAbsences = [...state.absences.filter(el => el.id !== action.oldAbsenceId)]
+        let newAbsences = state.absences.map(el => el.id === action.absenceId ? action.newAbsence : el);
         return {
             ...state,
-            absences: [...newAbsences, action.newAbsence],
+            absences: newAbsences,
         };
     }),
-    on(setAvailableDays, (state, action) => {
+    on(setAvailableDays, (state, action: AvailableDays) => {
         return {
             ...state,
             availableDays: action,
         };
     }),
-    on(handleDialogView, (state, action) => {
-        return {
-            ...state,
-            dialogs: { ...state.dialogs, [action.dialog]: action.state },
-        };
-    }),
-    on(setCurrentAbsence, (state, action) => {
-        return {
-            ...state,
-            currentAbsence: action,
-        };
-    }),
+
 );

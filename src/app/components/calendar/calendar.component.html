@@ -140,8 +140,8 @@
 </div>
 
 <app-dialog [title]="'Request Absence'" [currentAbsence]="currentAbsence" name="requestDialog"
-  [absenceTypes]="absenceTypes" [showDialog]="dialogs.requestDialog">
+  [absenceTypes]="absenceTypes" (closeDialog)="closeDialog($event)" [dialogs]="dialogs" [showDialog]="dialogs.requestDialog">
 </app-dialog>
 <app-dialog [title]="'Absence Period'" [currentAbsence]="currentAbsence" name="updateDialog"
-  [absenceTypes]="absenceTypes" [showDialog]="dialogs.updateDialog">
+  [absenceTypes]="absenceTypes" (closeDialog)="closeDialog($event)" [dialogs]="dialogs" [showDialog]="dialogs.updateDialog">
 </app-dialog>
