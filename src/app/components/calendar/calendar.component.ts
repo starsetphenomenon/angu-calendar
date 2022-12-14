@@ -262,6 +262,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
         this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
     }
 
+    setTodaysDate() {
+        this.date = moment()
+        this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
+    }
+
     closeDialog(dialogs: Dialogs) {
         return this.dialogs = { ...dialogs }
     }

@@ -22,6 +22,7 @@
           <h3 class="current__val">{{date.format('YYYY ')}}</h3>
           <mat-icon class="arrow" (click)="setCurrentDate(1, 'year')">keyboard_arrow_right</mat-icon>
         </div>
+        <button (click)="setTodaysDate()" class="request-button" mat-flat-button>Today</button>
       </div>
       <mat-form-field class="filter" appearance="outline">
         <mat-label class="filter-select bolder">Filter by absence type</mat-label>
@@ -140,8 +141,10 @@
 </div>
 
 <app-dialog [title]="'Request Absence'" [currentAbsence]="currentAbsence" name="requestDialog"
-  [absenceTypes]="absenceTypes" (closeDialog)="closeDialog($event)" [dialogs]="dialogs" [showDialog]="dialogs.requestDialog">
+  [absenceTypes]="absenceTypes" (closeDialog)="closeDialog($event)" [dialogs]="dialogs"
+  [showDialog]="dialogs.requestDialog">
 </app-dialog>
 <app-dialog [title]="'Absence Period'" [currentAbsence]="currentAbsence" name="updateDialog"
-  [absenceTypes]="absenceTypes" (closeDialog)="closeDialog($event)" [dialogs]="dialogs" [showDialog]="dialogs.updateDialog">
+  [absenceTypes]="absenceTypes" (closeDialog)="closeDialog($event)" [dialogs]="dialogs"
+  [showDialog]="dialogs.updateDialog">
 </app-dialog>
