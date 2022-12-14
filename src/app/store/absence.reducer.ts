@@ -51,26 +51,26 @@ const initialState: AppState = {
 
 export const absenceReducer = createReducer(
     initialState,
-    on(addAbsence, (state, action: AbsenceItem) => {
+    on(addAbsence, (state: AppState, action: AbsenceItem) => {
         return {
             ...state,
             absences: [...state.absences, { ...action, id: state.absences.length + 1 }],
         };
     }),
-    on(deleteAbsence, (state, action) => {
+    on(deleteAbsence, (state: AppState, action: { payload: number }) => {
         return {
             ...state,
             absences: [...state.absences.filter(el => el.id !== action.payload)],
         };
     }),
-    on(updateAbsence, (state, action) => {
+    on(updateAbsence, (state: AppState, action: { absenceId: number, newAbsence: AbsenceItem }) => {
         let newAbsences = state.absences.map(el => el.id === action.absenceId ? action.newAbsence : el);
         return {
             ...state,
             absences: newAbsences,
         };
     }),
-    on(setAvailableDays, (state, action: AvailableDays) => {
+    on(setAvailableDays, (state: AppState, action: AvailableDays) => {
         return {
             ...state,
             availableDays: action,

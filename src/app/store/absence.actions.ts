@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
-import { AvailableDays } from './absence.reducer';
+import { AppState, AvailableDays } from './absence.reducer';
 
 export const addAbsence = createAction(
     '[Absences] Add Absence',
