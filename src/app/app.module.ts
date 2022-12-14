@@ -14,12 +14,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatExpansionModule } from '@angular/material/expansion';
 
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { AbsencesService } from './services/absences.service';
+import { absenceReducer } from './store/absence.reducer';
 
 @NgModule({
   declarations: [
@@ -42,9 +45,11 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     MatNativeDateModule,
     MatFormFieldModule,
     MatInputModule,
+    MatExpansionModule,
+    StoreModule.forRoot({ appState: absenceReducer }),
     StoreDevtoolsModule.instrument(),
   ],
-  providers: [],
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, AbsencesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

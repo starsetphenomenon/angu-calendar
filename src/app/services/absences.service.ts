@@ -1,63 +1,31 @@
 import { Injectable } from '@angular/core';
-import * as moment from 'moment';
-import { BehaviorSubject } from 'rxjs';
+import { Store } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
+import { addAbsence, deleteAbsence, updateAbsence } from '../store/absence.actions';
+import { AppState } from '../store/absence.reducer';
+
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class AbsencesService {
 
-  constructor() { }
+  constructor(private store: Store<AppState>) { }
 
-  absencesArray: BehaviorSubject<AbsenceItem[]> = new BehaviorSubject<AbsenceItem[]>([
-    {
-      absType: 'sick',
-      fromDate: '2022-12-05',
-      toDate: '2022-12-08',
-      comment: 'I am sick now...',
-      taken: true,
-    },
-    {
-      absType: 'vacation',
-      fromDate: '2022-12-13',
-      toDate: '2022-12-17',
-      comment: 'Free man',
-      taken: false,
-    },
-    {
-      absType: 'vacation',
-      fromDate: '2022-11-07',
-      toDate: '2022-11-08',
-      comment: 'Iceland is waiting for me! :D',
-      taken: false,
-    },
-    {
-      absType: 'vacation',
-      fromDate: '2023-01-07',
-      toDate: '2023-01-08',
-      comment: 'Can not wait for it... Yeah boy!',
-      taken: false,
-    }
-  ])
+  currentAbsenceDate!: string;
+  currentAbsenceID!: number;
 
-  currentAbsenceID!: string;
-
-  addAbsence(abs: AbsenceItem) {
-    this.absencesArray.next([...this.absencesArray.value, abs])
+  addAbsence(absence: AbsenceItem) {
+    this.store.dispatch(addAbsence(absence))
   }
 
-  deleteAbsence(id: string) {
-    let item = this.absencesArray.value.find(item => (item.fromDate === id || item.toDate === id
-      || moment(id).isBetween(item.fromDate, item.toDate)))
-    this.absencesArray.next(this.absencesArray.value.filter(el => el !== item))
+  deleteAbsence(id: number) {
+    this.store.dispatch(deleteAbsence({ payload: id }))
   }
 
-  updateAbsence(absence: AbsenceItem, newAbsence: AbsenceItem) {
-    let item = this.absencesArray.value.find(item => (item.fromDate === absence.fromDate || item.toDate === absence.toDate))
-    if (item) {
-      this.absencesArray.next([...this.absencesArray.value.filter(el => el !== item), newAbsence])
-    }
+  updateAbsence(id: number, newAbsence: AbsenceItem) {
+    this.store.dispatch(updateAbsence({ absenceId: id, newAbsence: newAbsence }))
   }
 
 

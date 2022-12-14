@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as moment from 'moment';
-import { DialogService } from '../../services/dialog.service';
-import { distinctUntilChanged, filter, map, Observable } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { AbsencesService } from 'src/app/services/absences.service';
-
-
+import { Store } from '@ngrx/store';
+import { AppState, AvailableDays, Dialogs } from 'src/app/store/absence.reducer';
+import { setAvailableDays } from 'src/app/store/absence.actions';
 
 interface CalendarItem {
     day: string;
@@ -16,11 +16,11 @@ interface CalendarItem {
 }
 
 export interface AbsenceItem {
-    absType: string,
+    id: number,
+    absenceType: string,
     fromDate: string,
     toDate: string,
     comment: string,
-    taken: boolean,
 }
 
 export interface AbsenceType {
@@ -28,10 +28,10 @@ export interface AbsenceType {
     viewValue: string;
 }
 
-const enum AbsenceTypeEnums {
-    all = 'all',
-    sick = 'sick',
-    vacation = 'vacation',
+enum AbsenceTypeEnums {
+    ALL = 'all',
+    SICK = 'sick',
+    VACATION = 'vacation',
 }
 
 
@@ -41,68 +41,96 @@ const enum AbsenceTypeEnums {
     styleUrls: ['./calendar.component.scss']
 })
 
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, OnDestroy {
 
-    constructor(public dialogService: DialogService, private absencesService: AbsencesService) {
-
-    }
-
+    destroy$: Subject<boolean> = new Subject<boolean>();
     date = moment();
+    dateNow = new Date();
     calendar: Array<CalendarItem[]> = [];
     calendarType: string = 'month';
     months = moment.months();
     weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     selectedAbsenceFilter = '';
     selectedAbsenceType = 'sick';
+    AbsenceTypeEnums = AbsenceTypeEnums;
     absenceTypes: AbsenceType[] = [
-        { value: AbsenceTypeEnums.all, viewValue: 'All' },
-        { value: AbsenceTypeEnums.sick, viewValue: 'Sick' },
-        { value: AbsenceTypeEnums.vacation, viewValue: 'Vacation' }
+        { value: AbsenceTypeEnums.ALL, viewValue: 'All' },
+        { value: AbsenceTypeEnums.SICK, viewValue: 'Sick' },
+        { value: AbsenceTypeEnums.VACATION, viewValue: 'Vacation' }
     ];
     currentAbsence: AbsenceItem = {
-        absType: 'sick',
-        fromDate: this.absencesService.currentAbsenceID,
-        toDate: this.absencesService.currentAbsenceID,
+        id: 0,
+        absenceType: 'sick',
+        fromDate: this.absencesService.currentAbsenceDate,
+        toDate: this.absencesService.currentAbsenceDate,
         comment: '',
-        taken: false,
     }
 
+    availableDays: AvailableDays = {
+        sick: {
+            entitlement: 20,
+            taken: 0,
+        },
+        vacation: {
+            entitlement: 10,
+            taken: 0,
+        },
+    }
+    dialogs: Dialogs = {
+        requestDialog: false,
+        updateDialog: false,
+    }
+    absences: AbsenceItem[] = []
     absencesArray$?: Observable<AbsenceItem[]>;
+    availableDays$?: Observable<AvailableDays>;
 
+    constructor(public absencesService: AbsencesService, private store: Store<{ appState: AppState }>) { }
 
     ngOnInit(): void {
-        this.absencesArray$ = this.absencesService.absencesArray
-        this.absencesArray$.pipe(distinctUntilChanged()).subscribe(_ => this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter));
+        this.availableDays$ = this.store.select(store => store.appState.availableDays);
+        this.availableDays$.pipe(takeUntil(this.destroy$)).subscribe(availableDays => {
+            this.availableDays = availableDays;
+        });
+        this.absencesArray$ = this.store.select(store => store.appState.absences);
+        this.absencesArray$.pipe(takeUntil(this.destroy$)).subscribe(absences => {
+            this.absences = absences;
+            this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next(true);
+        this.destroy$.unsubscribe();
     }
 
     filterByAbsence() {
-        this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter)
+        this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
     }
 
-    updateAbsence(fullDate: string) {
-        this.absencesService.currentAbsenceID = fullDate;
-        let currentAbsence = this.absencesService.absencesArray.value.find(item => item.fromDate === fullDate || item.toDate === fullDate
-            || moment(fullDate).isBetween(item.fromDate, item.toDate))
+    updateAbsence(fullDate: string, id: number) {
+        this.absencesService.currentAbsenceDate = fullDate;
+        this.absencesService.currentAbsenceID = id;
+        let currentAbsence = this.absences.find(item => item.id === id);
         if (currentAbsence) {
-            this.currentAbsence = { ...currentAbsence }
+            this.currentAbsence = { ...currentAbsence };
         }
-        this.dialogService.currentAbsence = this.currentAbsence
-        this.handleDialogView(true, 'updateDialog', fullDate)
+        this.handleDialogView(true, 'updateDialog', fullDate);
     }
 
-    handleDialogView(state: boolean, dialog: any, currentDay: any) {
-        this.absencesService.currentAbsenceID = currentDay
-        this.currentAbsence === currentDay
+    handleDialogView(state: boolean, dialog: string, currentDay: string) {
+        currentDay ? this.absencesService.currentAbsenceDate = currentDay
+            : this.absencesService.currentAbsenceDate = moment(this.dateNow).format('YYYY-MM-DD');
+
         if (dialog === 'requestDialog') {
             this.currentAbsence = {
-                absType: 'sick',
-                fromDate: moment(this.absencesService.currentAbsenceID).format('DD/MM/YYYY'),
-                toDate: moment(this.absencesService.currentAbsenceID).format('DD/MM/YYYY'),
+                id: Date.now(),
+                absenceType: 'vacation',
+                fromDate: moment(this.dateNow).format('YYYY-MM-DD').toString(),
+                toDate: moment(this.absencesService.currentAbsenceDate).format('DD/MM/YYYY'),
                 comment: '',
-                taken: false,
-            }
+            };
         }
-        this.dialogService.handleDialogView(state, dialog)
+        this.dialogs = ({ ...this.dialogs, [dialog]: state })
     }
 
     setCalendarType(value: string) {
@@ -115,9 +143,36 @@ export class CalendarComponent implements OnInit {
     }
 
     createCalendar(month: moment.Moment, filter: string) {
-        let absences = this.absencesService.absencesArray.value;
+        if (!filter) {
+            filter = 'all';
+        }
+        let absences = this.absences;
+        let sickTakenDays = 0;
+        let vacationTakenDays = 0;
 
-        absences = absences.filter(abs => abs.absType !== filter)
+        absences.forEach(absence => {
+            if (absence.absenceType === AbsenceTypeEnums.SICK) {
+                sickTakenDays += moment.duration(moment(absence.toDate).diff(absence.fromDate)).asDays() + 1;
+            }
+            if (absence.absenceType === AbsenceTypeEnums.VACATION) {
+                vacationTakenDays += moment.duration(moment(absence.toDate).diff(absence.fromDate)).asDays() + 1;
+            }
+        })
+
+        this.store.dispatch(setAvailableDays({
+            sick: {
+                entitlement: this.availableDays.sick.entitlement,
+                taken: sickTakenDays,
+            },
+            vacation: {
+                entitlement: this.availableDays.vacation.entitlement,
+                taken: vacationTakenDays,
+            }
+        }))
+
+        if (filter !== AbsenceTypeEnums.ALL) {
+            absences = absences.filter(absence => absence.absenceType === filter);
+        }
 
         const daysInMonth = month.daysInMonth();
         const startOfMonth = month.startOf('months').format('ddd');
@@ -149,14 +204,14 @@ export class CalendarComponent implements OnInit {
         }
 
         let result = calendar.reduce((pre: Array<CalendarItem[]>, curr: CalendarItem) => {
-            absences.forEach(abs => {
-                if (moment(curr.fullDate).isBetween(abs.fromDate, abs.toDate)) { // mark all days btw the dates
+            absences.forEach(absence => {
+                if (moment(curr.fullDate).isBetween(absence.fromDate, absence.toDate)) {
                     curr.absence = {
-                        absType: abs.absType,
-                        fromDate: abs.fromDate,
-                        toDate: abs.toDate,
-                        comment: abs.comment,
-                        taken: true,
+                        id: absence.id,
+                        absenceType: absence.absenceType,
+                        fromDate: absence.fromDate,
+                        toDate: absence.toDate,
+                        comment: absence.comment,
                     }
                 }
             })
@@ -174,20 +229,20 @@ export class CalendarComponent implements OnInit {
     createCalendarItem(data: moment.Moment, className: string, absences: AbsenceItem[]) {
         const dayName = data.format('ddd');
         let absenceItem = {
-            absType: '',
+            id: 0,
+            absenceType: '',
             fromDate: '',
             toDate: '',
             comment: '',
-            taken: false,
         }
-        absences.forEach(el => {
-            if (el.fromDate === data.format('YYYY-MM-DD') || el.toDate === data.format('YYYY-MM-DD')) {
+        absences.forEach(absence => {
+            if (absence.fromDate === data.format('YYYY-MM-DD') || absence.toDate === data.format('YYYY-MM-DD')) {
                 absenceItem = {
-                    absType: el.absType,
-                    fromDate: el.fromDate,
-                    toDate: el.toDate,
-                    comment: el.comment,
-                    taken: true,
+                    id: absence.id,
+                    absenceType: absence.absenceType,
+                    fromDate: absence.fromDate,
+                    toDate: absence.toDate,
+                    comment: absence.comment,
                 }
             }
         })
@@ -205,5 +260,9 @@ export class CalendarComponent implements OnInit {
     setCurrentDate(val: number, type: any) {
         this.date.add(val, type);
         this.calendar = this.createCalendar(this.date, this.selectedAbsenceFilter);
+    }
+
+    closeDialog(dialogs: Dialogs) {
+        return this.dialogs = { ...dialogs }
     }
 }
