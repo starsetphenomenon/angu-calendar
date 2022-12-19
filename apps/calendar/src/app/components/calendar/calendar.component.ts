@@ -176,6 +176,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     let absences = this.absences;
     let sickTakenDays = 0;
     let vacationTakenDays = 0;
+    console.log(this.status, absences)
+    console.log('RENDER~~~~~~~')
     absences.forEach((absence) => {
       if (absence.absenceType === AbsenceTypeEnums.SICK) {
         sickTakenDays +=
