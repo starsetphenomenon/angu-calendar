@@ -2,12 +2,14 @@ import { createReducer, on } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
 import {
   addAbsence,
+  deleteAbsence,
   getAllAbsences,
   setAllAbsences,
   setAvailableDays,
   setStatusError,
   setStatusPending,
   setStatusSucces,
+  updateAbsence,
 } from './absence.actions';
 
 export interface AvailableDays {
@@ -71,6 +73,19 @@ export const absenceReducer = createReducer(
         { ...action, id: state.absences.length + 1 },
       ],
 
+    };
+  }),
+  on(deleteAbsence, (state: AppState, action: { payload: number }) => {
+    return {
+      ...state,
+      absences: [...state.absences.filter(el => el.id !== action.payload)],
+    };
+  }),
+  on(updateAbsence, (state: AppState, action: { id: number, newAbsence: AbsenceItem }) => {
+    let newAbsences = state.absences.map(el => el.id === action.id ? action.newAbsence : el);
+    return {
+      ...state,
+      absences: newAbsences,
     };
   }),
   on(setAvailableDays, (state: AppState, action: AvailableDays) => {

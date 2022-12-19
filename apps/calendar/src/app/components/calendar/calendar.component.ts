@@ -99,15 +99,15 @@ export class CalendarComponent implements OnInit, OnDestroy {
     );
     this.availableDays$
       .pipe(takeUntil(this.destroy$))
-      .subscribe((availableDays) => {
-        this.availableDays = availableDays;
-      });
+      .subscribe((availableDays) => this.availableDays = availableDays);
     this.status$ = this.store.select((store) => store.appState.status);
     this.status$.pipe(takeUntil(this.destroy$)).subscribe(status => this.status = status)
     this.absencesArray$ = this.store.select((store) => store.appState.absences);
     this.absencesArray$.pipe(takeUntil(this.destroy$)).subscribe((absences) => {
+      console.log('RENDER', this.status)
       if (!absences) {
         this.store.dispatch(setStatusPending())
+        return
       }
       this.status === 'success' ? this.absences = absences : this.absences = [];
       this.calendar = this.createCalendar(
@@ -176,8 +176,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
     let absences = this.absences;
     let sickTakenDays = 0;
     let vacationTakenDays = 0;
-    console.log(this.status, absences)
-    console.log('RENDER~~~~~~~')
     absences.forEach((absence) => {
       if (absence.absenceType === AbsenceTypeEnums.SICK) {
         sickTakenDays +=

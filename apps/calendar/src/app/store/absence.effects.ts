@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { catchError, exhaustMap, map, of } from "rxjs";
 import { AbsencesService } from "../services/absences.service";
-import { addAbsence, deleteAbsence, getAllAbsences, setAllAbsences, setStatusPending, updateAbsence } from "./absence.actions";
+import { addAbsence, deleteAbsence, getAllAbsences, setAllAbsences, setStatusError, setStatusPending, setStatusSucces, updateAbsence } from "./absence.actions";
 
 
 @Injectable()
@@ -14,48 +14,46 @@ export class AbsenceEffects {
         exhaustMap(() => {
             return this.absencesService.getAllAbsences().pipe(
                 map((absences) => {
-                    setStatusPending()
                     return setAllAbsences({ payload: absences })
                 })
             )
         }),
-        catchError(error => of('Error: ', error))
+        catchError(error => of(setStatusError, error))
     ));
 
     addAbsence$ = createEffect(() => this.actions$.pipe(
         ofType(addAbsence),
         exhaustMap((absence) => {
             return this.absencesService.addAbsence(absence).pipe(
-                map((absence) => {
-                    setStatusPending()
-                    return addAbsence(absence);
+                map(() => {
+                    return setStatusSucces();
                 })
             )
         }),
-        catchError(error => of('Error: ', error))
+        catchError(error => of(setStatusError, error))
     ));
 
     deleteAbsence$ = createEffect(() => this.actions$.pipe(
         ofType(deleteAbsence),
         exhaustMap((action) => {
             return this.absencesService.deleteAbsence(action.payload).pipe(
-                map((absences) => {
-                    return setAllAbsences({ payload: absences });
+                map(() => {
+                    return setStatusSucces();
                 })
             )
         }),
-        catchError(error => of('Error: ', error))
+        catchError(error => of(setStatusError, error))
     ));
 
     updateAbsence$ = createEffect(() => this.actions$.pipe(
         ofType(updateAbsence),
         exhaustMap((action) => {
             return this.absencesService.updateAbsence(action.id, action.newAbsence).pipe(
-                map((absences) => {
-                    return setAllAbsences({ payload: absences });
+                map(() => {
+                    return setStatusSucces();
                 })
             )
         }),
-        catchError(error => of('Error: ', error))
+        catchError(error => of(setStatusError, error))
     ));
 }
