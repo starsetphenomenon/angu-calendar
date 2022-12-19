@@ -23,6 +23,9 @@ import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AbsencesService } from './services/absences.service';
 import { absenceReducer } from './store/absence.reducer';
+import { HttpClientModule } from '@angular/common/http';
+import { EffectsModule } from '@ngrx/effects';
+import { AbsenceEffects } from './store/absence.effects';
 
 @NgModule({
   declarations: [AppComponent, CalendarComponent, DialogComponent],
@@ -44,8 +47,10 @@ import { absenceReducer } from './store/absence.reducer';
     MatExpansionModule,
     StoreModule.forRoot({ appState: absenceReducer }),
     StoreDevtoolsModule.instrument(),
+    EffectsModule.forRoot([AbsenceEffects]),
+    HttpClientModule,
   ],
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, AbsencesService],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

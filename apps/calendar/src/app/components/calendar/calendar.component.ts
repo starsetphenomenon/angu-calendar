@@ -8,7 +8,7 @@ import {
   AvailableDays,
   Dialogs,
 } from '../../store/absence.reducer';
-import { setAvailableDays } from '../../store/absence.actions';
+import { getAllAbsences, setAvailableDays, setStatusPending } from '../../store/absence.actions';
 
 interface CalendarItem {
   day: string;
@@ -84,13 +84,16 @@ export class CalendarComponent implements OnInit, OnDestroy {
   absences: AbsenceItem[] = [];
   absencesArray$?: Observable<AbsenceItem[]>;
   availableDays$?: Observable<AvailableDays>;
+  status?: string;
+  status$?: Observable<string>;
 
   constructor(
     public absencesService: AbsencesService,
     private store: Store<{ appState: AppState }>
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+    this.store.dispatch(getAllAbsences())
     this.availableDays$ = this.store.select(
       (store) => store.appState.availableDays
     );
@@ -99,9 +102,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
       .subscribe((availableDays) => {
         this.availableDays = availableDays;
       });
+    this.status$ = this.store.select((store) => store.appState.status);
+    this.status$.pipe(takeUntil(this.destroy$)).subscribe(status => this.status = status)
     this.absencesArray$ = this.store.select((store) => store.appState.absences);
     this.absencesArray$.pipe(takeUntil(this.destroy$)).subscribe((absences) => {
-      this.absences = absences;
+      if (!absences) {
+        this.store.dispatch(setStatusPending())
+      }
+      this.status === 'success' ? this.absences = absences : this.absences = [];
       this.calendar = this.createCalendar(
         this.date,
         this.selectedAbsenceFilter
@@ -132,8 +140,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     currentDay
       ? (this.absencesService.currentAbsenceDate = currentDay)
       : (this.absencesService.currentAbsenceDate = moment(this.dateNow).format(
-          'YYYY-MM-DD'
-        ));
+        'YYYY-MM-DD'
+      ));
 
     if (dialog === 'requestDialog') {
       this.currentAbsence = {
@@ -168,7 +176,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
     let absences = this.absences;
     let sickTakenDays = 0;
     let vacationTakenDays = 0;
-
     absences.forEach((absence) => {
       if (absence.absenceType === AbsenceTypeEnums.SICK) {
         sickTakenDays +=

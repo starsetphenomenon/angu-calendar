@@ -2,9 +2,12 @@ import { createReducer, on } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
 import {
   addAbsence,
-  deleteAbsence,
+  getAllAbsences,
+  setAllAbsences,
   setAvailableDays,
-  updateAbsence,
+  setStatusError,
+  setStatusPending,
+  setStatusSucces,
 } from './absence.actions';
 
 export interface AvailableDays {
@@ -26,6 +29,7 @@ export interface Dialogs {
 export interface AppState {
   absences: AbsenceItem[];
   availableDays: AvailableDays;
+  status: 'pending' | 'success' | 'error';
 }
 
 const initialState: AppState = {
@@ -39,60 +43,58 @@ const initialState: AppState = {
       taken: 4,
     },
   },
-  absences: [
-    {
-      id: 1,
-      absenceType: 'sick',
-      fromDate: '2022-12-17',
-      toDate: '2022-12-21',
-      comment: 'I am SICK!',
-    },
-    {
-      id: 2,
-      absenceType: 'vacation',
-      fromDate: '2022-12-02',
-      toDate: '2022-12-07',
-      comment: 'Yuppi, freedom...',
-    },
-  ],
+  absences: [],
+  status: 'pending',
 };
 
 export const absenceReducer = createReducer(
   initialState,
-  on(addAbsence, (state: AppState, action: AbsenceItem) => {
+  on(getAllAbsences, (state) => {
     return {
       ...state,
+      status: 'pending',
+    }
+  }),
+  on(setAllAbsences, (state: AppState, action) => {
+    return {
+      ...state,
+      absences: action.payload,
+      status: 'success',
+    }
+  }),
+  on(addAbsence, (state, action: AbsenceItem) => {
+    return {
+      ...state,
+      status: 'success',
       absences: [
         ...state.absences,
         { ...action, id: state.absences.length + 1 },
       ],
+
     };
   }),
-  on(deleteAbsence, (state: AppState, action: { payload: number }) => {
-    return {
-      ...state,
-      absences: [...state.absences.filter((el) => el.id !== action.payload)],
-    };
-  }),
-  on(
-    updateAbsence,
-    (
-      state: AppState,
-      action: { absenceId: number; newAbsence: AbsenceItem }
-    ) => {
-      let newAbsences = state.absences.map((el) =>
-        el.id === action.absenceId ? action.newAbsence : el
-      );
-      return {
-        ...state,
-        absences: newAbsences,
-      };
-    }
-  ),
   on(setAvailableDays, (state: AppState, action: AvailableDays) => {
     return {
       ...state,
       availableDays: action,
     };
+  }),
+  on(setStatusSucces, (state) => {
+    return {
+      ...state,
+      status: 'success'
+    }
+  }),
+  on(setStatusPending, (state) => {
+    return {
+      ...state,
+      status: 'pending'
+    }
+  }),
+  on(setStatusError, (state) => {
+    return {
+      ...state,
+      status: 'error'
+    }
   })
 );

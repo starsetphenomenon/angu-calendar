@@ -14,6 +14,7 @@ import { AbsencesService } from '../../services/absences.service';
 import { select, Store } from '@ngrx/store';
 import { map, Subject, takeUntil } from 'rxjs';
 import { AppState, Dialogs } from '../../store/absence.reducer';
+import { addAbsence, deleteAbsence, setStatusError, setStatusPending, updateAbsence } from '../../store/absence.actions';
 
 interface AvailableDays {
   sick: number;
@@ -130,10 +131,8 @@ export class DialogComponent implements OnInit, OnChanges, OnDestroy {
 
     this.changeDateFormat(this.absenceForm.value);
     this.absenceForm.value.comment = this.currentAbsence.comment;
-    this.absencesService.updateAbsence(
-      this.absencesService.currentAbsenceID,
-      this.absenceForm.value
-    );
+    this.store.dispatch(setStatusPending())
+    this.store.dispatch(updateAbsence({ id: this.absencesService.currentAbsenceID, newAbsence: this.absenceForm.value }));
     this.handleDialogView(false);
   }
 
@@ -149,7 +148,7 @@ export class DialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   deleteAbsence() {
-    this.absencesService.deleteAbsence(this.absencesService.currentAbsenceID);
+    this.store.dispatch(deleteAbsence({ payload: this.absencesService.currentAbsenceID }))
     this.handleDialogView(false);
   }
 
@@ -165,7 +164,8 @@ export class DialogComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     this.changeDateFormat(data);
-    this.absencesService.addAbsence(data);
+    this.store.dispatch(setStatusPending())
+    this.store.dispatch(addAbsence(data))
     this.handleDialogView(false);
   }
 
