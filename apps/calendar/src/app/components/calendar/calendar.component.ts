@@ -104,7 +104,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.status$.pipe(takeUntil(this.destroy$)).subscribe(status => this.status = status)
     this.absencesArray$ = this.store.select((store) => store.appState.absences);
     this.absencesArray$.pipe(takeUntil(this.destroy$)).subscribe((absences) => {
-      console.log('RENDER', this.status)
       if (!absences) {
         this.store.dispatch(setStatusPending())
         return

@@ -14,7 +14,7 @@ import { AbsencesService } from '../../services/absences.service';
 import { select, Store } from '@ngrx/store';
 import { map, Subject, takeUntil } from 'rxjs';
 import { AppState, Dialogs } from '../../store/absence.reducer';
-import { addAbsence, deleteAbsence, setStatusError, setStatusPending, updateAbsence } from '../../store/absence.actions';
+import { addAbsence, deleteAbsence, setStatusPending, updateAbsence } from '../../store/absence.actions';
 
 interface AvailableDays {
   sick: number;

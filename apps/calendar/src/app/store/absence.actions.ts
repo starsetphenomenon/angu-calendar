@@ -3,12 +3,12 @@ import { AbsenceItem } from '../components/calendar/calendar.component';
 import { AvailableDays } from './absence.reducer';
 
 export const getAllAbsences = createAction(
-  '[Absences] Get All Absences',
+  '[Absences API] Get All Absences',
 );
 
 export const setAllAbsences = createAction(
   '[Absences] Get All Absences',
-  props<{ payload: AbsenceItem[] }>()
+  props<{ absences: AbsenceItem[], availableDays: AvailableDays }>()
 );
 
 export const addAbsence = createAction(
@@ -16,7 +16,17 @@ export const addAbsence = createAction(
   props<AbsenceItem>()
 );
 
+export const addAbsenceSuccess = createAction(
+  '[Absences API] Add Absence',
+  props<AbsenceItem>()
+);
+
 export const deleteAbsence = createAction(
+  '[Absences] Delete Absence',
+  props<{ payload: number }>()
+);
+
+export const deleteAbsenceSuccess = createAction(
   '[Absences] Delete Absence',
   props<{ payload: number }>()
 );

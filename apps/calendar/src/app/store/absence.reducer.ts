@@ -2,14 +2,13 @@ import { createReducer, on } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
 import {
   addAbsence,
-  deleteAbsence,
+  addAbsenceSuccess,  
   getAllAbsences,
   setAllAbsences,
   setAvailableDays,
   setStatusError,
   setStatusPending,
-  setStatusSucces,
-  updateAbsence,
+  setStatusSucces,  
 } from './absence.actions';
 
 export interface AvailableDays {
@@ -60,11 +59,18 @@ export const absenceReducer = createReducer(
   on(setAllAbsences, (state: AppState, action) => {
     return {
       ...state,
-      absences: action.payload,
+      absences: action.absences,
+      availableDays: action.availableDays,
       status: 'success',
     }
   }),
-  on(addAbsence, (state, action: AbsenceItem) => {
+  on(addAbsence, (state) => {
+    return {
+      ...state,
+      status: 'pending',
+    };
+  }),
+  on(addAbsenceSuccess, (state, action: AbsenceItem) => {
     return {
       ...state,
       status: 'success',
@@ -73,19 +79,6 @@ export const absenceReducer = createReducer(
         { ...action, id: state.absences.length + 1 },
       ],
 
-    };
-  }),
-  on(deleteAbsence, (state: AppState, action: { payload: number }) => {
-    return {
-      ...state,
-      absences: [...state.absences.filter(el => el.id !== action.payload)],
-    };
-  }),
-  on(updateAbsence, (state: AppState, action: { id: number, newAbsence: AbsenceItem }) => {
-    let newAbsences = state.absences.map(el => el.id === action.id ? action.newAbsence : el);
-    return {
-      ...state,
-      absences: newAbsences,
     };
   }),
   on(setAvailableDays, (state: AppState, action: AvailableDays) => {
