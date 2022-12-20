@@ -40,5 +40,5 @@
       "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
     }
   },
-  "defaultProject": "backend"
+  "defaultProject": "calendar"
 }

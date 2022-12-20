@@ -6,6 +6,7 @@ import { AvailableDays } from '../store/absence.reducer';
 @Injectable({
   providedIn: 'root',
 })
+
 export class AbsencesService {
   constructor(
     private http: HttpClient) { }
@@ -13,19 +14,22 @@ export class AbsencesService {
   currentAbsenceDate!: string;
   currentAbsenceID!: number;
 
+  BASE_URL: string = 'https://calendar-back.azurewebsites.net';
+  API: string = 'api/absences'
+
   addAbsence(absence: AbsenceItem) {
-    return this.http.post<{ absences: AbsenceItem[], availableDays: AvailableDays }>('http://localhost:3333/api/absences', absence);
+    return this.http.post<{ absences: AbsenceItem[], availableDays: AvailableDays }>(`${this.BASE_URL}/${this.API}`, absence);
   }
 
   getAllAbsences() {
-    return this.http.get<{ absences: AbsenceItem[], availableDays: AvailableDays }>('http://localhost:3333/api/absences');
+    return this.http.get<{ absences: AbsenceItem[], availableDays: AvailableDays }>(`${this.BASE_URL}/${this.API}`);
   }
 
   deleteAbsence(id: number) {
-    return this.http.delete<{ absences: AbsenceItem[], availableDays: AvailableDays }>(`http://localhost:3333/api/absences/${id}`);
+    return this.http.delete<{ absences: AbsenceItem[], availableDays: AvailableDays }>(`${this.BASE_URL}/${this.API}/${id}`);
   }
 
   updateAbsence(id: number, newAbsence: AbsenceItem) {
-    return this.http.put<{ absences: AbsenceItem[], availableDays: AvailableDays }>(`http://localhost:3333/api/absences/${id}`, newAbsence);
+    return this.http.put<{ absences: AbsenceItem[], availableDays: AvailableDays }>(`${this.BASE_URL}/${this.API}/${id}`, newAbsence);
   }
 }
