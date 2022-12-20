@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { catchError, exhaustMap, map, of } from "rxjs";
 import { AbsencesService } from "../services/absences.service";
-import { addAbsence, addAbsenceSuccess, deleteAbsence, getAllAbsences, setAllAbsences, setStatusError, updateAbsence } from "./absence.actions";
+import { addAbsence, deleteAbsence, getAllAbsences, setAllAbsences, setStatusError, updateAbsence } from "./absence.actions";
 
 
 @Injectable()
@@ -25,8 +25,8 @@ export class AbsenceEffects {
         ofType(addAbsence),
         exhaustMap((absence) => {
             return this.absencesService.addAbsence(absence).pipe(
-                map(() => {
-                    return addAbsenceSuccess(absence);
+                map(({ absences, availableDays }) => {
+                    return setAllAbsences({ absences, availableDays });
                 })
             )
         }),

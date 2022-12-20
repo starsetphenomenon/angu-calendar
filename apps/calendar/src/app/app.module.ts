@@ -18,6 +18,7 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatExpansionModule } from '@angular/material/expansion';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -45,6 +46,7 @@ import { AbsenceEffects } from './store/absence.effects';
     MatFormFieldModule,
     MatInputModule,
     MatExpansionModule,
+    MatProgressSpinnerModule,
     StoreModule.forRoot({ appState: absenceReducer }),
     StoreDevtoolsModule.instrument(),
     EffectsModule.forRoot([AbsenceEffects]),

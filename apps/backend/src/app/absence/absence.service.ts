@@ -37,10 +37,11 @@ export class AbsenceService {
         absence.toDate = body.toDate;
         absence.comment = body.comment;
 
-        const absences = await this.absenceRepository.save(absence);
-        const newAbsences = await this.absenceRepository.find();
+        await this.absenceRepository.save(absence);
+        const absences = await this.absenceRepository.find();
+
         return {
-            availableDays: this.getAvailableDays(newAbsences),
+            availableDays: this.getAvailableDays(absences),
             absences,
         }
     }

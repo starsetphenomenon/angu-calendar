@@ -8,7 +8,7 @@ import {
   AvailableDays,
   Dialogs,
 } from '../../store/absence.reducer';
-import { getAllAbsences, setAvailableDays, setStatusPending } from '../../store/absence.actions';
+import { getAllAbsences, setStatusPending } from '../../store/absence.actions';
 
 interface CalendarItem {
   day: string;
@@ -94,12 +94,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.store.dispatch(getAllAbsences())
-    this.availableDays$ = this.store.select(
-      (store) => store.appState.availableDays
-    );
-    this.availableDays$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((availableDays) => this.availableDays = availableDays);
+    this.availableDays$ = this.store.select((store) => store.appState.availableDays);
+    this.availableDays$.pipe(takeUntil(this.destroy$)).subscribe((availableDays) => this.availableDays = availableDays);
     this.status$ = this.store.select((store) => store.appState.status);
     this.status$.pipe(takeUntil(this.destroy$)).subscribe(status => this.status = status)
     this.absencesArray$ = this.store.select((store) => store.appState.absences);
@@ -189,19 +185,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
             .asDays() + 1;
       }
     });
-
-    this.store.dispatch(
-      setAvailableDays({
-        sick: {
-          entitlement: this.availableDays.sick.entitlement,
-          taken: sickTakenDays,
-        },
-        vacation: {
-          entitlement: this.availableDays.vacation.entitlement,
-          taken: vacationTakenDays,
-        },
-      })
-    );
 
     if (filter !== AbsenceTypeEnums.ALL) {
       absences = absences.filter((absence) => absence.absenceType === filter);

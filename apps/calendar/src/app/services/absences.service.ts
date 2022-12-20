@@ -1,22 +1,20 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
-import { AppState, AvailableDays } from '../store/absence.reducer';
+import { AvailableDays } from '../store/absence.reducer';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AbsencesService {
   constructor(
-    private http: HttpClient,
-    private store: Store<AppState>) { }
+    private http: HttpClient) { }
 
   currentAbsenceDate!: string;
   currentAbsenceID!: number;
 
   addAbsence(absence: AbsenceItem) {
-    return this.http.post<AbsenceItem>('http://localhost:3333/api/absences', absence);
+    return this.http.post<{ absences: AbsenceItem[], availableDays: AvailableDays }>('http://localhost:3333/api/absences', absence);
   }
 
   getAllAbsences() {

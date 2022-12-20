@@ -131,6 +131,7 @@ export class DialogComponent implements OnInit, OnChanges, OnDestroy {
 
     this.changeDateFormat(this.absenceForm.value);
     this.absenceForm.value.comment = this.currentAbsence.comment;
+    this.store.dispatch(setStatusPending())
     this.store.dispatch(updateAbsence({ id: this.absencesService.currentAbsenceID, newAbsence: this.absenceForm.value }));
     this.handleDialogView(false);
   }

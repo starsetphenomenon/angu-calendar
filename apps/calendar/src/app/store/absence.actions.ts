@@ -16,17 +16,7 @@ export const addAbsence = createAction(
   props<AbsenceItem>()
 );
 
-export const addAbsenceSuccess = createAction(
-  '[Absences API] Add Absence',
-  props<AbsenceItem>()
-);
-
 export const deleteAbsence = createAction(
-  '[Absences] Delete Absence',
-  props<{ payload: number }>()
-);
-
-export const deleteAbsenceSuccess = createAction(
   '[Absences] Delete Absence',
   props<{ payload: number }>()
 );
@@ -34,11 +24,6 @@ export const deleteAbsenceSuccess = createAction(
 export const updateAbsence = createAction(
   '[Absences] Update Absence',
   props<{ id: number; newAbsence: AbsenceItem }>()
-);
-
-export const setAvailableDays = createAction(
-  '[Available Days] Update Available Days',
-  props<AvailableDays>()
 );
 
 export const setStatusSucces = createAction(

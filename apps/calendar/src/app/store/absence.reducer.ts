@@ -2,13 +2,13 @@ import { createReducer, on } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
 import {
   addAbsence,
-  addAbsenceSuccess,  
+  deleteAbsence,
   getAllAbsences,
   setAllAbsences,
-  setAvailableDays,
   setStatusError,
   setStatusPending,
-  setStatusSucces,  
+  setStatusSucces,
+  updateAbsence,
 } from './absence.actions';
 
 export interface AvailableDays {
@@ -70,21 +70,16 @@ export const absenceReducer = createReducer(
       status: 'pending',
     };
   }),
-  on(addAbsenceSuccess, (state, action: AbsenceItem) => {
+  on(updateAbsence, (state) => {
     return {
       ...state,
-      status: 'success',
-      absences: [
-        ...state.absences,
-        { ...action, id: state.absences.length + 1 },
-      ],
-
+      status: 'pending',
     };
   }),
-  on(setAvailableDays, (state: AppState, action: AvailableDays) => {
+  on(deleteAbsence, (state) => {
     return {
       ...state,
-      availableDays: action,
+      status: 'pending',
     };
   }),
   on(setStatusSucces, (state) => {
