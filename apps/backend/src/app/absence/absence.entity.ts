@@ -8,10 +8,10 @@ export class AbsenceEntity {
     @Column()
     absenceType!: string;
 
-    @Column()
+    @Column({ type: 'date' })
     fromDate!: string;
 
-    @Column()
+    @Column({ type: 'date' })
     toDate!: string;
 
     @Column()

@@ -8,7 +8,16 @@ export const getAllAbsences = createAction(
 
 export const setAllAbsences = createAction(
   '[Absences] Get All Absences',
-  props<{ absences: AbsenceItem[], availableDays: AvailableDays }>()
+  props<{ absences: AbsenceItem[] }>()
+);
+
+export const setAvailableDays = createAction(
+  '[Days] Get Available Days',
+  props<{ availableDays: AvailableDays }>()
+);
+
+export const updateAvailableDays = createAction(
+  '[Days] Update Available Days',
 );
 
 export const addAbsence = createAction(

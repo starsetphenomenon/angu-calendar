@@ -9,6 +9,7 @@ import {
   Dialogs,
 } from '../../store/absence.reducer';
 import { getAllAbsences, setStatusPending } from '../../store/absence.actions';
+import { AbsenceTypeEnums } from '../../../../../../libs/shared/absence/absence.model';
 
 interface CalendarItem {
   day: string;
@@ -30,12 +31,6 @@ export interface AbsenceItem {
 export interface AbsenceType {
   value: AbsenceTypeEnums;
   viewValue: string;
-}
-
-enum AbsenceTypeEnums {
-  ALL = 'all',
-  SICK = 'sick',
-  VACATION = 'vacation',
 }
 
 @Component({

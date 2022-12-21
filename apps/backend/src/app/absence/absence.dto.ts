@@ -1,7 +1,9 @@
+import { IsInt, IsString } from 'class-validator';
+
 export class AbsenceDto {
-    id!: number;
-    absenceType!: string;
-    fromDate!: string;
-    toDate!: string;
-    comment!: string;
+    @IsInt() id!: number;
+    @IsString({ always: true }) absenceType!: string;
+    @IsString({ always: true }) fromDate!: string;
+    @IsString({ always: true }) toDate!: string;
+    @IsString({ always: true }) comment!: string;
 }

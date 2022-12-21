@@ -5,10 +5,12 @@ import {
   deleteAbsence,
   getAllAbsences,
   setAllAbsences,
+  setAvailableDays,
   setStatusError,
   setStatusPending,
   setStatusSucces,
   updateAbsence,
+  updateAvailableDays,
 } from './absence.actions';
 
 export interface AvailableDays {
@@ -36,12 +38,12 @@ export interface AppState {
 const initialState: AppState = {
   availableDays: {
     sick: {
-      entitlement: 20,
-      taken: 7,
+      entitlement: 0,
+      taken: 0,
     },
     vacation: {
-      entitlement: 10,
-      taken: 4,
+      entitlement: 0,
+      taken: 0,
     },
   },
   absences: [],
@@ -60,8 +62,20 @@ export const absenceReducer = createReducer(
     return {
       ...state,
       absences: action.absences,
+      status: 'success',
+    }
+  }),
+  on(setAvailableDays, (state: AppState, action) => {
+    return {
+      ...state,
       availableDays: action.availableDays,
       status: 'success',
+    }
+  }),
+  on(updateAvailableDays, (state: AppState, _) => {
+    return {
+      ...state,
+      status: 'pending',
     }
   }),
   on(addAbsence, (state) => {

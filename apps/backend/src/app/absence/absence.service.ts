@@ -3,13 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AbsenceEntity } from './absence.entity';
 import { AbsenceDto } from './absence.dto'
+import { AbsenceTypeEnums } from '../../../../../libs/shared/absence/absence.model';
 import * as moment from 'moment';
-
-enum AbsenceTypeEnums {
-    ALL = 'all',
-    SICK = 'sick',
-    VACATION = 'vacation',
-}
 
 @Injectable()
 export class AbsenceService {
@@ -18,42 +13,31 @@ export class AbsenceService {
         private readonly absenceRepository: Repository<AbsenceEntity>
     ) { }
 
-    SICK_ENTITLEMENT = 10;
-    VACATION_ENTITLEMENT = 20;
+    private readonly sickEntitlement = 10;
+    private readonly vacationEntitlement = 20;
 
     async getAll() {
         const absences = await this.absenceRepository.find();
-        return {
-            availableDays: this.getAvailableDays(absences),
-            absences: absences,
-        }
+        return { absences };
+    }
+
+    async getDays() {
+        const absences = await this.absenceRepository.find();
+        return this.getAvailableDays(absences);
     }
 
     async addAbsence(body: AbsenceDto) {
         const absence: AbsenceEntity = new AbsenceEntity();
-
         absence.absenceType = body.absenceType;
         absence.fromDate = body.fromDate;
         absence.toDate = body.toDate;
         absence.comment = body.comment;
-
         await this.absenceRepository.save(absence);
-        const absences = await this.absenceRepository.find();
-
-        return {
-            availableDays: this.getAvailableDays(absences),
-            absences,
-        }
     }
 
     async deleteAbsence(id: number) {
         await this.absenceRepository.delete({ id: id });
-        const absences = await this.absenceRepository.find();
-        const newAbsences = await this.absenceRepository.find();
-        return {
-            availableDays: this.getAvailableDays(absences),
-            absences: newAbsences,
-        }
+
     }
 
     async updateAbsence(id: number, absence: AbsenceDto) {
@@ -62,11 +46,6 @@ export class AbsenceService {
         }, {
             ...absence,
         });
-        const absences = await this.absenceRepository.find();
-        return {
-            availableDays: this.getAvailableDays(absences),
-            absences,
-        }
     }
 
     getAvailableDays(data: AbsenceEntity[]) {
@@ -88,11 +67,11 @@ export class AbsenceService {
         });
         return {
             sick: {
-                entitlement: this.SICK_ENTITLEMENT,
+                entitlement: this.sickEntitlement,
                 taken: sickTakenDays,
             },
             vacation: {
-                entitlement: this.VACATION_ENTITLEMENT,
+                entitlement: this.vacationEntitlement,
                 taken: vacationTakenDays,
             },
         }

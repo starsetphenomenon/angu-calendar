@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AbsenceModule } from './absence/absence.module';
 
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AbsenceEntity } from './absence/absence.entity';
 
 @Module({
@@ -21,6 +20,6 @@ import { AbsenceEntity } from './absence/absence.entity';
     AbsenceModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule { }

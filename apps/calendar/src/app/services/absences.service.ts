@@ -14,22 +14,27 @@ export class AbsencesService {
   currentAbsenceDate!: string;
   currentAbsenceID!: number;
 
-  BASE_URL: string = 'https://calendar-back.azurewebsites.net';
+  BASE_URL: string = 'http://localhost:3333';
   API: string = 'api/absences'
 
-  addAbsence(absence: AbsenceItem) {
-    return this.http.post<{ absences: AbsenceItem[], availableDays: AvailableDays }>(`${this.BASE_URL}/${this.API}`, absence);
+  getAllAbsences() {
+    return this.http.get<{ absences: AbsenceItem[] }>(`${this.BASE_URL}/${this.API}`);
   }
 
-  getAllAbsences() {
-    return this.http.get<{ absences: AbsenceItem[], availableDays: AvailableDays }>(`${this.BASE_URL}/${this.API}`);
+  getAvailableDays() {
+    return this.http.get<AvailableDays>(`${this.BASE_URL}/${this.API}/availableDays`);
+  }
+
+  addAbsence(absence: AbsenceItem) {
+    return this.http.post(`${this.BASE_URL}/${this.API}`, absence);
   }
 
   deleteAbsence(id: number) {
-    return this.http.delete<{ absences: AbsenceItem[], availableDays: AvailableDays }>(`${this.BASE_URL}/${this.API}/${id}`);
+    return this.http.delete(`${this.BASE_URL}/${this.API}/${id}`);
   }
 
   updateAbsence(id: number, newAbsence: AbsenceItem) {
-    return this.http.put<{ absences: AbsenceItem[], availableDays: AvailableDays }>(`${this.BASE_URL}/${this.API}/${id}`, newAbsence);
+    return this.http.put(`${this.BASE_URL}/${this.API}/${id}`, newAbsence);
   }
+
 }

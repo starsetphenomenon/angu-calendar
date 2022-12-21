@@ -1,59 +1,91 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, exhaustMap, map, of } from "rxjs";
+import { catchError, concatMap, exhaustMap, map, of, switchMap } from "rxjs";
 import { AbsencesService } from "../services/absences.service";
-import { addAbsence, deleteAbsence, getAllAbsences, setAllAbsences, setStatusError, updateAbsence } from "./absence.actions";
+import * as actions from "./absence.actions";
 
 
 @Injectable()
 export class AbsenceEffects {
-    constructor(private actions$: Actions, private absencesService: AbsencesService) { }
+    constructor(
+        private actions$: Actions,
+        private absencesService: AbsencesService
+    ) { }
 
     getAbsences$ = createEffect(() => this.actions$.pipe(
-        ofType(getAllAbsences),
+        ofType(actions.getAllAbsences),
         exhaustMap(() => {
-            return this.absencesService.getAllAbsences().pipe(
-                map(({ absences, availableDays }) => {
-                    return setAllAbsences({ absences, availableDays })
+            return this.absencesService.getAllAbsences();
+        }),
+        switchMap(({ absences }) => {
+            return [
+                actions.updateAvailableDays(),
+                actions.setAllAbsences({ absences })
+            ]
+        }),
+        catchError(error => of(actions.setStatusError(), error))
+    ));
+
+    getDays$ = createEffect(() => this.actions$.pipe(
+        ofType(actions.updateAvailableDays),
+        exhaustMap(() => {
+            return this.absencesService.getAvailableDays().pipe(
+                map((availableDays) => {
+                    return actions.setAvailableDays({ availableDays });
                 })
             )
         }),
-        catchError(error => of(setStatusError(), error))
+        catchError(error => of(actions.setStatusError(), error))
     ));
 
     addAbsence$ = createEffect(() => this.actions$.pipe(
-        ofType(addAbsence),
-        exhaustMap((absence) => {
-            return this.absencesService.addAbsence(absence).pipe(
-                map(({ absences, availableDays }) => {
-                    return setAllAbsences({ absences, availableDays });
-                })
-            )
+        ofType(actions.addAbsence),
+        concatMap((absence) => {
+            return this.absencesService.addAbsence(absence);
         }),
-        catchError(error => of(setStatusError(), error))
+        exhaustMap(() => {
+            return this.absencesService.getAllAbsences();
+        }),
+        switchMap(({ absences }) => {
+            return [
+                actions.updateAvailableDays(),
+                actions.setAllAbsences({ absences })
+            ]
+        }),
+        catchError(error => of(actions.setStatusError(), error))
     ));
 
     deleteAbsence$ = createEffect(() => this.actions$.pipe(
-        ofType(deleteAbsence),
-        exhaustMap((action) => {
-            return this.absencesService.deleteAbsence(action.payload).pipe(
-                map(({ absences, availableDays }) => {
-                    return setAllAbsences({ absences, availableDays });
-                })
-            )
+        ofType(actions.deleteAbsence),
+        concatMap((action) => {
+            return this.absencesService.deleteAbsence(action.payload);
         }),
-        catchError(error => of(setStatusError(), error))
+        exhaustMap(() => {
+            return this.absencesService.getAllAbsences();
+        }),
+        switchMap(({ absences }) => {
+            return [
+                actions.updateAvailableDays(),
+                actions.setAllAbsences({ absences })
+            ]
+        }),
+        catchError(error => of(actions.setStatusError(), error))
     ));
 
     updateAbsence$ = createEffect(() => this.actions$.pipe(
-        ofType(updateAbsence),
-        exhaustMap((action) => {
-            return this.absencesService.updateAbsence(action.id, action.newAbsence).pipe(
-                map(({ absences, availableDays }) => {
-                    return setAllAbsences({ absences, availableDays });
-                })
-            )
+        ofType(actions.updateAbsence),
+        concatMap((action) => {
+            return this.absencesService.updateAbsence(action.id, action.newAbsence);
         }),
-        catchError(error => of(setStatusError(), error))
+        exhaustMap(() => {
+            return this.absencesService.getAllAbsences();
+        }),
+        switchMap(({ absences }) => {
+            return [
+                actions.updateAvailableDays(),
+                actions.setAllAbsences({ absences })
+            ]
+        }),
+        catchError(error => of(actions.setStatusError(), error))
     ));
 }
