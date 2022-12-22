@@ -14,7 +14,7 @@ export class AbsenceController {
 
     @Get('/availableDays')
     async getAvailableDays() {
-        return this.absenceService.getDays();
+        return this.absenceService.getAvailableDays();
     }
 
     @Post()

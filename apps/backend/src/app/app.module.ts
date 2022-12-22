@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AbsenceModule } from './absence/absence.module';
 
-import { AppController } from './app.controller';
 import { AbsenceEntity } from './absence/absence.entity';
 
 @Module({
@@ -19,7 +18,7 @@ import { AbsenceEntity } from './absence/absence.entity';
   }),
     AbsenceModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [],
 })
 export class AppModule { }

@@ -9,7 +9,7 @@ import {
   Dialogs,
 } from '../../store/absence.reducer';
 import { getAllAbsences, setStatusPending } from '../../store/absence.actions';
-import { AbsenceTypeEnums } from '../../../../../../libs/shared/absence/absence.model';
+import { AbsenceTypeEnums } from '../../../../../../libs/shared/src';
 
 interface CalendarItem {
   day: string;

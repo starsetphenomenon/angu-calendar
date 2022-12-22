@@ -1,9 +1,10 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AbsenceEntity } from './absence.entity';
-import { AbsenceDto } from './absence.dto'
-import { AbsenceTypeEnums } from '../../../../../libs/shared/absence/absence.model';
+import { AbsenceDto } from './absence.dto';
+import { AbsenceTypeEnums } from 'shared';
 import * as moment from 'moment';
 
 @Injectable()
@@ -18,12 +19,12 @@ export class AbsenceService {
 
     async getAll() {
         const absences = await this.absenceRepository.find();
-        return { absences };
+        return absences;
     }
 
-    async getDays() {
+    async getAvailableDays() {
         const absences = await this.absenceRepository.find();
-        return this.getAvailableDays(absences);
+        return this.countAvailableDays(absences);
     }
 
     async addAbsence(body: AbsenceDto) {
@@ -32,23 +33,22 @@ export class AbsenceService {
         absence.fromDate = body.fromDate;
         absence.toDate = body.toDate;
         absence.comment = body.comment;
-        await this.absenceRepository.save(absence);
+        return await this.absenceRepository.save(absence);
     }
 
     async deleteAbsence(id: number) {
-        await this.absenceRepository.delete({ id: id });
-
+        return await this.absenceRepository.delete({ id: id });
     }
 
     async updateAbsence(id: number, absence: AbsenceDto) {
-        await this.absenceRepository.update({
+        return await this.absenceRepository.update({
             id,
         }, {
             ...absence,
         });
     }
 
-    getAvailableDays(data: AbsenceEntity[]) {
+    countAvailableDays(data: AbsenceEntity[]) {
         let sickTakenDays = 0;
         let vacationTakenDays = 0;
         data.forEach((absence) => {

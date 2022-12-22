@@ -17,7 +17,7 @@ export class AbsenceEffects {
         exhaustMap(() => {
             return this.absencesService.getAllAbsences();
         }),
-        switchMap(({ absences }) => {
+        switchMap((absences) => {
             return [
                 actions.updateAvailableDays(),
                 actions.setAllAbsences({ absences })
@@ -43,13 +43,10 @@ export class AbsenceEffects {
         concatMap((absence) => {
             return this.absencesService.addAbsence(absence);
         }),
-        exhaustMap(() => {
-            return this.absencesService.getAllAbsences();
-        }),
-        switchMap(({ absences }) => {
+        switchMap(() => {
             return [
-                actions.updateAvailableDays(),
-                actions.setAllAbsences({ absences })
+                actions.getAllAbsences(),
+                actions.updateAvailableDays()
             ]
         }),
         catchError(error => of(actions.setStatusError(), error))
@@ -60,13 +57,10 @@ export class AbsenceEffects {
         concatMap((action) => {
             return this.absencesService.deleteAbsence(action.payload);
         }),
-        exhaustMap(() => {
-            return this.absencesService.getAllAbsences();
-        }),
-        switchMap(({ absences }) => {
+        switchMap(() => {
             return [
-                actions.updateAvailableDays(),
-                actions.setAllAbsences({ absences })
+                actions.getAllAbsences(),
+                actions.updateAvailableDays()
             ]
         }),
         catchError(error => of(actions.setStatusError(), error))
@@ -77,13 +71,10 @@ export class AbsenceEffects {
         concatMap((action) => {
             return this.absencesService.updateAbsence(action.id, action.newAbsence);
         }),
-        exhaustMap(() => {
-            return this.absencesService.getAllAbsences();
-        }),
-        switchMap(({ absences }) => {
+        switchMap(() => {
             return [
-                actions.updateAvailableDays(),
-                actions.setAllAbsences({ absences })
+                actions.getAllAbsences(),
+                actions.updateAvailableDays()
             ]
         }),
         catchError(error => of(actions.setStatusError(), error))

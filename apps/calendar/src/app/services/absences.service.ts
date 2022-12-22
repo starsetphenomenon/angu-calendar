@@ -18,7 +18,7 @@ export class AbsencesService {
   API: string = 'api/absences'
 
   getAllAbsences() {
-    return this.http.get<{ absences: AbsenceItem[] }>(`${this.BASE_URL}/${this.API}`);
+    return this.http.get<AbsenceItem[]>(`${this.BASE_URL}/${this.API}`);
   }
 
   getAvailableDays() {
