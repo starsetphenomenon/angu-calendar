@@ -18,7 +18,7 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatExpansionModule } from '@angular/material/expansion';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -55,4 +55,4 @@ import { AbsenceEffects } from './store/absence.effects';
   providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, AbsencesService],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

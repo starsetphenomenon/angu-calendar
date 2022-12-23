@@ -3,13 +3,9 @@ import * as moment from 'moment';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { AbsencesService } from '../../services/absences.service';
 import { Store } from '@ngrx/store';
-import {
-  AppState,
-  AvailableDays,
-  Dialogs,
-} from '../../store/absence.reducer';
+import { AppState, AvailableDays, Dialogs } from '../../store/absence.reducer';
 import { getAllAbsences, setStatusPending } from '../../store/absence.actions';
-import { AbsenceTypeEnums } from '../../../../../../libs/shared/src';
+import { AbsenceTypeEnums } from 'shared';
 
 interface CalendarItem {
   day: string;
@@ -85,21 +81,29 @@ export class CalendarComponent implements OnInit, OnDestroy {
   constructor(
     public absencesService: AbsencesService,
     private store: Store<{ appState: AppState }>
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.store.dispatch(getAllAbsences())
-    this.availableDays$ = this.store.select((store) => store.appState.availableDays);
-    this.availableDays$.pipe(takeUntil(this.destroy$)).subscribe((availableDays) => this.availableDays = availableDays);
+    this.store.dispatch(getAllAbsences());
+    this.availableDays$ = this.store.select(
+      (store) => store.appState.availableDays
+    );
+    this.availableDays$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((availableDays) => (this.availableDays = availableDays));
     this.status$ = this.store.select((store) => store.appState.status);
-    this.status$.pipe(takeUntil(this.destroy$)).subscribe(status => this.status = status)
+    this.status$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((status) => (this.status = status));
     this.absencesArray$ = this.store.select((store) => store.appState.absences);
     this.absencesArray$.pipe(takeUntil(this.destroy$)).subscribe((absences) => {
       if (!absences) {
-        this.store.dispatch(setStatusPending())
-        return
+        this.store.dispatch(setStatusPending());
+        return;
       }
-      this.status === 'success' ? this.absences = absences : this.absences = [];
+      this.status === 'success'
+        ? (this.absences = absences)
+        : (this.absences = []);
       this.calendar = this.createCalendar(
         this.date,
         this.selectedAbsenceFilter
@@ -130,8 +134,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     currentDay
       ? (this.absencesService.currentAbsenceDate = currentDay)
       : (this.absencesService.currentAbsenceDate = moment(this.dateNow).format(
-        'YYYY-MM-DD'
-      ));
+          'YYYY-MM-DD'
+        ));
 
     if (dialog === 'requestDialog') {
       this.currentAbsence = {

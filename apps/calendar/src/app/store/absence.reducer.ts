@@ -56,27 +56,27 @@ export const absenceReducer = createReducer(
     return {
       ...state,
       status: 'pending',
-    }
+    };
   }),
   on(setAllAbsences, (state: AppState, action) => {
     return {
       ...state,
       absences: action.absences,
       status: 'success',
-    }
+    };
   }),
   on(setAvailableDays, (state: AppState, action) => {
     return {
       ...state,
       availableDays: action.availableDays,
       status: 'success',
-    }
+    };
   }),
   on(updateAvailableDays, (state: AppState, _) => {
     return {
       ...state,
       status: 'pending',
-    }
+    };
   }),
   on(addAbsence, (state) => {
     return {
@@ -99,19 +99,19 @@ export const absenceReducer = createReducer(
   on(setStatusSucces, (state) => {
     return {
       ...state,
-      status: 'success'
-    }
+      status: 'success',
+    };
   }),
   on(setStatusPending, (state) => {
     return {
       ...state,
-      status: 'pending'
-    }
+      status: 'pending',
+    };
   }),
   on(setStatusError, (state) => {
     return {
       ...state,
-      status: 'error'
-    }
+      status: 'error',
+    };
   })
 );

@@ -2,9 +2,7 @@ import { createAction, props } from '@ngrx/store';
 import { AbsenceItem } from '../components/calendar/calendar.component';
 import { AvailableDays } from './absence.reducer';
 
-export const getAllAbsences = createAction(
-  '[Absences API] Get All Absences',
-);
+export const getAllAbsences = createAction('[Absences API] Get All Absences');
 
 export const setAllAbsences = createAction(
   '[Absences] Get All Absences',
@@ -16,9 +14,7 @@ export const setAvailableDays = createAction(
   props<{ availableDays: AvailableDays }>()
 );
 
-export const updateAvailableDays = createAction(
-  '[Days] Update Available Days',
-);
+export const updateAvailableDays = createAction('[Days] Update Available Days');
 
 export const addAbsence = createAction(
   '[Absences] Add Absence',
@@ -35,14 +31,8 @@ export const updateAbsence = createAction(
   props<{ id: number; newAbsence: AbsenceItem }>()
 );
 
-export const setStatusSucces = createAction(
-  '[Status] Set Status Secces'
-)
+export const setStatusSucces = createAction('[Status] Set Status Secces');
 
-export const setStatusPending = createAction(
-  '[Status] Set Status Pending'
-)
+export const setStatusPending = createAction('[Status] Set Status Pending');
 
-export const setStatusError = createAction(
-  '[Status] Set Status Error'
-)
+export const setStatusError = createAction('[Status] Set Status Error');

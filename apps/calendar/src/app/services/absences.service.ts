@@ -6,23 +6,23 @@ import { AvailableDays } from '../store/absence.reducer';
 @Injectable({
   providedIn: 'root',
 })
-
 export class AbsencesService {
-  constructor(
-    private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   currentAbsenceDate!: string;
   currentAbsenceID!: number;
 
-  BASE_URL: string = 'http://localhost:3333';
-  API: string = 'api/absences'
+  BASE_URL: string = 'https://calendar-back.azurewebsites.net';
+  API: string = 'api/absences';
 
   getAllAbsences() {
     return this.http.get<AbsenceItem[]>(`${this.BASE_URL}/${this.API}`);
   }
 
   getAvailableDays() {
-    return this.http.get<AvailableDays>(`${this.BASE_URL}/${this.API}/availableDays`);
+    return this.http.get<AvailableDays>(
+      `${this.BASE_URL}/${this.API}/availableDays`
+    );
   }
 
   addAbsence(absence: AbsenceItem) {
@@ -36,5 +36,4 @@ export class AbsencesService {
   updateAbsence(id: number, newAbsence: AbsenceItem) {
     return this.http.put(`${this.BASE_URL}/${this.API}/${id}`, newAbsence);
   }
-
 }
