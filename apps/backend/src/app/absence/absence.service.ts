@@ -6,6 +6,7 @@ import { AbsenceEntity } from './absence.entity';
 import { AbsenceDto } from './absence.dto';
 import { AbsenceTypeEnums } from 'shared';
 import * as moment from 'moment';
+import { UserDto } from '../user/user.dto';
 
 @Injectable()
 export class AbsenceService {
@@ -17,22 +18,29 @@ export class AbsenceService {
     private readonly sickEntitlement = 10;
     private readonly vacationEntitlement = 20;
 
-    async getAll() {
-        const absences = await this.absenceRepository.find();
+    async getAll(user: UserDto) {
+        const absences = await this.absenceRepository.find({
+            where: {
+                user: { id: user.id }
+            },
+        })
         return absences;
     }
 
-    async getAvailableDays() {
-        const absences = await this.absenceRepository.find();
+    async getAvailableDays(user: UserDto) {
+        const absences = await this.absenceRepository.find({
+            where: {
+                user: { id: user.id }
+            },
+        });
         return this.countAvailableDays(absences);
     }
 
-    async addAbsence(body: AbsenceDto) {
-        const absence: AbsenceEntity = new AbsenceEntity();
-        absence.absenceType = body.absenceType;
-        absence.fromDate = body.fromDate;
-        absence.toDate = body.toDate;
-        absence.comment = body.comment;
+    async addAbsence(body: { user: UserDto, absence: AbsenceDto }) {
+        const absence = await this.absenceRepository.create({
+            ...body.absence,
+            user: body.user,
+        });
         return await this.absenceRepository.save(absence);
     }
 
@@ -65,6 +73,7 @@ export class AbsenceService {
                         .asDays() + 1;
             }
         });
+
         return {
             sick: {
                 entitlement: this.sickEntitlement,

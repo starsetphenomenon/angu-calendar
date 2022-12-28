@@ -1,13 +1,14 @@
   <div class="register-page">
-    <h1>Registration</h1>
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+    <div *ngIf="userCreated" class="created">
+      <h1>User successfully created!</h1>
+    </div>
+    <mat-spinner *ngIf="userCreated"></mat-spinner>
+    <form *ngIf="!userCreated" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <h1>Registration</h1>
+      <span *ngIf="errorMessage?.length" class="error">{{errorMessage}}</span>
       <mat-form-field class="register-item" appearance="outline">
-        <mat-label>First Name</mat-label>
-        <input matInput placeholder="Jozhef" formControlName="userFirstName" name="userFirstName">
-      </mat-form-field>
-      <mat-form-field class="register-item" appearance="outline">
-        <mat-label>Last Name</mat-label>
-        <input matInput placeholder="Attila" formControlName="userLastName" name="userLastName">
+        <mat-label>Email</mat-label>
+        <input matInput placeholder="Attila" formControlName="email" name="email">
       </mat-form-field>
       <mat-form-field class="register-item" appearance="outline">
         <mat-label>User Name</mat-label>

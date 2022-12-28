@@ -26,6 +26,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AbsencesService } from './services/absences.service';
+import { AuthService } from './services/auth.service'
 import { absenceReducer } from './store/absence.reducer';
 import { HttpClientModule } from '@angular/common/http';
 import { EffectsModule } from '@ngrx/effects';
@@ -56,7 +57,7 @@ import { AbsenceEffects } from './store/absence.effects';
     HttpClientModule,
     AppRoutingModule,
   ],
-  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, AbsencesService],
+  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, AbsencesService, AuthService],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

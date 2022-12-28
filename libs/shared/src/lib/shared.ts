@@ -3,3 +3,4 @@ export enum AbsenceTypeEnums {
   SICK = 'sick',
   VACATION = 'vacation',
 }
+
