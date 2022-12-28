@@ -108,7 +108,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     let localUser = JSON.parse(localStorage.getItem('user') as string);
     if (localUser) {
-      this.authService.setUser(localUser);
+      this.authService.setUserIsAuthenticated(true);
       this.store.dispatch(setUser(localUser));
     }
     this.user$ = this.store.select((store) => store.appState.user);
@@ -117,7 +117,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       .subscribe((user) => {
         localStorage.setItem('user', JSON.stringify(user));
         this.user = user;
-        this.authService.setUser(user);
+
       });
     this.store.dispatch(getAllAbsences(this.user));
     this.availableDays$ = this.store.select(
@@ -149,7 +149,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next(true);
     this.destroy$.unsubscribe();
-    localStorage.removeItem('user')
+    localStorage.removeItem('user');
+    localStorage.removeItem('userAuthenticated');
   }
 
   filterByAbsence() {
