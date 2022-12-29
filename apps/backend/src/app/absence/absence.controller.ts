@@ -10,18 +10,16 @@ export class AbsenceController {
 
     @Get()
     async getAll(@Query() query: { user: string }) {
-        const user = JSON.parse(query.user)
-        return this.absenceService.getAll(user);
+        return this.absenceService.getAll(query.user);
     }
 
     @Get('/availableDays')
     async getAvailableDays(@Query() query: { user: string }) {
-        const user = JSON.parse(query.user)
-        return this.absenceService.getAvailableDays(user);
+        return this.absenceService.getAvailableDays(query.user);
     }
 
     @Post()
-    async addAbsence(@Body() body: { user: UserDto, absence: AbsenceDto }) {
+    async addAbsence(@Body() body: { userToken: string, absence: AbsenceDto }) {
         return this.absenceService.addAbsence(body);
     }
 

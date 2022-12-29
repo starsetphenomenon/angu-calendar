@@ -4,47 +4,55 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { UserDto } from './user.dto';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(UserEntity)
-        private readonly userRepository: Repository<UserEntity>
+        private readonly userRepository: Repository<UserEntity>,
+        private jwtService: JwtService
     ) { }
 
-    async authenticateUser(user: UserDto) {
-        const checkUser = await this.userRepository.findOneBy({
+    async loginUser(user: UserDto) {
+        const userExist = await this.userRepository.findOneBy({
             email: user.email,
         });
 
-        if (!checkUser) {
-            return 'User does not exist!';
+        if (!userExist) {
+            throw new UnauthorizedException('User does not exist!');
         }
 
-        if (checkUser.password !== user.password) {
-            return 'Wrong password!';
+        if (!await bcrypt.compare(user.password, userExist.password)) {
+            throw new UnauthorizedException('Wrong password!');
         }
 
-        return checkUser;
+        return await this.jwtService.signAsync({ id: userExist.id });
     }
 
-    async addUser(body: UserDto) {
-        const userExist = await this.userRepository.findOneBy({
+    async registerUser(body: UserDto) {
+        const userNameExist = await this.userRepository.findOneBy({
             email: body.email,
         });
 
-        if (userExist && (userExist.userName === body.userName)) {
-            return 'Username has already been taken';
+        const userEmailExist = await this.userRepository.findOneBy({
+            userName: body.userName,
+        });
+
+        if (userEmailExist) {
+            throw new UnauthorizedException('Username has already been taken!');
         }
 
-        if (userExist) {
-            return 'Email has already been taken';
+        if (userNameExist) {
+            throw new UnauthorizedException('Email has already been taken!');
         }
 
+        const hashedPassword = await bcrypt.hash(body.password, 8);
         const user: UserEntity = new UserEntity();
         user.userName = body.userName;
         user.email = body.email;
-        user.password = body.password;
+        user.password = hashedPassword;
         return await this.userRepository.save(user);
     }
 

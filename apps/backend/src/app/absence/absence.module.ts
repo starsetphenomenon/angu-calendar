@@ -7,6 +7,9 @@ import { AbsenceService } from './absence.service';
 @Module({
   controllers: [AbsenceController],
   providers: [AbsenceService],
-  imports: [TypeOrmModule.forFeature([AbsenceEntity])]
+  imports: [
+    TypeOrmModule.forFeature([AbsenceEntity]),
+    
+  ]
 })
 export class AbsenceModule { }

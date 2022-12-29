@@ -7,39 +7,44 @@ import { AbsenceDto } from './absence.dto';
 import { AbsenceTypeEnums } from 'shared';
 import * as moment from 'moment';
 import { UserDto } from '../user/user.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AbsenceService {
     constructor(
         @InjectRepository(AbsenceEntity)
-        private readonly absenceRepository: Repository<AbsenceEntity>
+        private readonly absenceRepository: Repository<AbsenceEntity>,
+        private jwtService: JwtService
     ) { }
 
     private readonly sickEntitlement = 10;
     private readonly vacationEntitlement = 20;
 
-    async getAll(user: UserDto) {
+    async getAll(userToken: string) {
+        const { id } = await this.jwtService.verify(userToken);
         const absences = await this.absenceRepository.find({
             where: {
-                user: { id: user.id }
+                user: { id }
             },
         })
         return absences;
     }
 
-    async getAvailableDays(user: UserDto) {
+    async getAvailableDays(userToken: string) {
+        const { id } = await this.jwtService.verify(userToken);
         const absences = await this.absenceRepository.find({
             where: {
-                user: { id: user.id }
+                user: { id }
             },
         });
         return this.countAvailableDays(absences);
     }
 
-    async addAbsence(body: { user: UserDto, absence: AbsenceDto }) {
+    async addAbsence(body: { userToken: string, absence: AbsenceDto }) {
+        const { id } = await this.jwtService.verify(body.userToken);
         const absence = await this.absenceRepository.create({
             ...body.absence,
-            user: body.user,
+            user: id,
         });
         return await this.absenceRepository.save(absence);
     }
