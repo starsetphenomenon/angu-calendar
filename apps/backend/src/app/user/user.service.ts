@@ -15,6 +15,14 @@ export class UserService {
         private jwtService: JwtService
     ) { }
 
+    async validateUser(id: number) {
+        const userExist = await this.userRepository.findOneBy({ id });
+        if (!userExist) {
+            throw new UnauthorizedException('Wrong Token!');
+        }
+        return userExist;
+    }
+
     async loginUser(user: UserDto) {
         const userExist = await this.userRepository.findOneBy({
             email: user.email,

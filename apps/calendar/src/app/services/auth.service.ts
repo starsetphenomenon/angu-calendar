@@ -18,7 +18,6 @@ export class AuthService {
 
     BASE_URL: string = 'http://localhost:3333';
     API: string = 'api/users';
-    userIsAuthenticated?: boolean;
 
     registerUser(user: User) {
         return this.http.post<User>(`${this.BASE_URL}/${this.API}/register`, user);
@@ -30,7 +29,11 @@ export class AuthService {
 
     updateAbsences() {
         this.store.select(store => store.appState.token).subscribe(token => this.store.dispatch(getAllAbsences({ token })));
-    } 
+    }
+
+    redirectToRegister() {
+        this.router.navigate(['/register']);
+    }
 
     redirectToLogin() {
         this.router.navigate(['/login']);

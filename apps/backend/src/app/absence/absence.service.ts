@@ -6,7 +6,6 @@ import { AbsenceEntity } from './absence.entity';
 import { AbsenceDto } from './absence.dto';
 import { AbsenceTypeEnums } from 'shared';
 import * as moment from 'moment';
-import { UserDto } from '../user/user.dto';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -26,7 +25,7 @@ export class AbsenceService {
             where: {
                 user: { id }
             },
-        })
+        });
         return absences;
     }
 
