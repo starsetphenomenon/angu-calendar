@@ -19,8 +19,13 @@ export class AbsenceService {
     private readonly sickEntitlement = 10;
     private readonly vacationEntitlement = 20;
 
+    async getTokenId(token: string) {
+        const { id } = await this.jwtService.verify(token);
+        return id;
+    }
+
     async getAll(userToken: string) {
-        const { id } = await this.jwtService.verify(userToken);
+        const id = await this.getTokenId(userToken);
         const absences = await this.absenceRepository.find({
             where: {
                 user: { id }
@@ -30,7 +35,7 @@ export class AbsenceService {
     }
 
     async getAvailableDays(userToken: string) {
-        const { id } = await this.jwtService.verify(userToken);
+        const id = await this.getTokenId(userToken);
         const absences = await this.absenceRepository.find({
             where: {
                 user: { id }
@@ -40,7 +45,7 @@ export class AbsenceService {
     }
 
     async addAbsence(userToken: string, absence: AbsenceDto) {
-        const { id } = await this.jwtService.verify(userToken);
+        const id = await this.getTokenId(userToken);
         const newAbsence = await this.absenceRepository.create({
             ...absence,
             user: id,

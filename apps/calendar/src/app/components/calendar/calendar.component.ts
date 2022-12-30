@@ -4,8 +4,9 @@ import { Observable, Subject, takeUntil } from 'rxjs';
 import { AbsencesService } from '../../services/absences.service';
 import { Store } from '@ngrx/store';
 import { AppState, AvailableDays, Dialogs } from '../../store/absence.reducer';
-import { getAllAbsences, setStatusPending, setToken } from '../../store/absence.actions';
+import { getAllAbsences, setStatusPending } from '../../store/absence.actions';
 import { AbsenceTypeEnums } from 'shared';
+import { AuthService } from '../../services/auth.service';
 
 interface CalendarItem {
   day: string;
@@ -90,32 +91,20 @@ export class CalendarComponent implements OnInit, OnDestroy {
   availableDays$?: Observable<AvailableDays>;
   status?: string;
   status$?: Observable<string>;
-  token$?: Observable<string>;
-  token!: string;
-  localToken!: string;
+  localToken!: string | null;
 
   constructor(
     public absencesService: AbsencesService,
-    private store: Store<{ appState: AppState }>
+    private store: Store<{ appState: AppState }>,
+    private authService: AuthService,
   ) { }
 
   ngOnInit(): void {
-    this.localToken = JSON.parse(localStorage.getItem('token') as string);
-    if (this.localToken) {
-      this.store.dispatch(setToken({ token: this.localToken }));
+    this.localToken = this.authService.getLocalToken();
+    if (this.localToken !== null) {
+      this.store.dispatch(getAllAbsences({ token: this.localToken }));
     }
-    this.token$ = this.store.select((store) => store.appState.token);
-    this.token$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((token) => {
-        localStorage.setItem('token', JSON.stringify(token));
-        this.token = token;
-
-      });
-    this.store.dispatch(getAllAbsences({ token: this.token }));
-    this.availableDays$ = this.store.select(
-      (store) => store.appState.availableDays
-    );
+    this.availableDays$ = this.store.select((store) => store.appState.availableDays);
     this.availableDays$
       .pipe(takeUntil(this.destroy$))
       .subscribe((availableDays) => (this.availableDays = availableDays));

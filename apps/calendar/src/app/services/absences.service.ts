@@ -2,14 +2,18 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AbsenceItem, User, UserAbsence } from '../components/calendar/calendar.component';
+import { getAllAbsences } from '../store/absence.actions';
 import { AppState, AvailableDays } from '../store/absence.reducer';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AbsencesService {
   constructor(private http: HttpClient,
-    private store: Store<{ appState: AppState }>) { }
+    private store: Store<{ appState: AppState }>,
+    private authService: AuthService,
+  ) { }
 
   currentAbsenceDate!: string;
   currentAbsenceID!: number;
@@ -20,16 +24,13 @@ export class AbsencesService {
   getAllAbsences(token: string) {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
     });
     return this.http.get<AbsenceItem[]>(`${this.BASE_URL}/${this.API}`, { headers });
   }
 
   getAvailableDays() {
-    let token!: string;
-    this.store.select(store => store.appState.token).subscribe(userToken => (token = userToken));
-    const params = new HttpParams().append('user', token);
-    return this.http.get<AvailableDays>(`${this.BASE_URL}/${this.API}/availableDays`, { params, headers: this.getHeaders() });
+    return this.http.get<AvailableDays>(`${this.BASE_URL}/${this.API}/availableDays`, { headers: this.getHeaders() });
   }
 
   addAbsence(absence: AbsenceItem) {
@@ -44,9 +45,15 @@ export class AbsencesService {
     return this.http.put(`${this.BASE_URL}/${this.API}/${id}`, newAbsence);
   }
 
+  updateAbsences() {
+    const token = this.authService.getLocalToken();
+    if (token !== null) {
+      this.store.dispatch(getAllAbsences({ token }));
+    }
+  }
+
   getHeaders() {
-    let token!: string;
-    this.store.select(store => store.appState.token).subscribe(userToken => (token = userToken))
+    const token = this.authService.getLocalToken();
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`

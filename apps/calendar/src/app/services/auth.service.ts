@@ -1,9 +1,8 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { User } from '../components/calendar/calendar.component';
-import { getAllAbsences } from '../store/absence.actions';
 import { AppState } from '../store/absence.reducer';
 
 @Injectable({
@@ -27,10 +26,6 @@ export class AuthService {
         return this.http.post<User>(`${this.BASE_URL}/${this.API}/login`, user);
     }
 
-    updateAbsences() {
-        this.store.select(store => store.appState.token).subscribe(token => this.store.dispatch(getAllAbsences({ token })));
-    }
-
     redirectToRegister() {
         this.router.navigate(['/register']);
     }
@@ -41,6 +36,14 @@ export class AuthService {
 
     redirectToCalendar() {
         this.router.navigate(['/calendar']);
+    }
+
+    setLocalToken(token: string) {
+        localStorage.setItem('token', token);
+    }
+
+    getLocalToken() {
+        return localStorage.getItem('token');
     }
 }
 

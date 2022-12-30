@@ -15,30 +15,21 @@ import { AppState } from '../../store/absence.reducer';
 export class RegisterPage implements OnInit, OnDestroy {
 
     destroy$: Subject<boolean> = new Subject<boolean>();
-    userToken?: string;
-    userToken$?: Observable<string>;
     errorMessage?: string;
     errorMessage$?: Observable<string>;
 
     constructor(
         private store: Store<{ appState: AppState }>,
-        private authService: AuthService,
+        public authService: AuthService,
     ) { }
 
     ngOnInit(): void {
         this.errorMessage$ = this.store.select((store) => store.appState.errorMessage);
-        this.userToken$ = this.store.select((store) => store.appState.token);
-        this.userToken$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((token) => {
-                this.userToken = token;
-            });
         this.errorMessage$
             .pipe(takeUntil(this.destroy$))
             .subscribe((message) => {
                 this.errorMessage = message;
             });
-        this.userToken = '';
     }
 
     ngOnDestroy(): void {

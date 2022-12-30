@@ -33,11 +33,6 @@ export const updateAbsence = createAction(
   props<{ id: number; newAbsence: AbsenceItem }>()
 );
 
-export const setToken = createAction(
-  '[Token] Set Token',
-  props<{ token: string }>()
-);
-
 export const registerUser = createAction(
   '[Users] register User',
   props<User>()

@@ -16,28 +16,20 @@ export class LoginPage implements OnInit, OnDestroy {
     destroy$: Subject<boolean> = new Subject<boolean>();
     errorMessage?: string;
     errorMessage$?: Observable<string>;
-    userToken?: string;
-    userToken$?: Observable<string>;
 
     constructor(
         private store: Store<{ appState: AppState }>,
-        private authService: AuthService,
+        public authService: AuthService,
     ) { }
 
     ngOnInit(): void {
-        this.userToken$ = this.store.select((store) => store.appState.token);
-        this.userToken$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((token) => {
-                this.userToken = token;
-            });
+        localStorage.removeItem('token');
         this.errorMessage$ = this.store.select((store) => store.appState.errorMessage);
         this.errorMessage$
             .pipe(takeUntil(this.destroy$))
             .subscribe((message) => {
                 this.errorMessage = message;
             });
-        this.userToken = '';
     }
 
     ngOnDestroy(): void {

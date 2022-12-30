@@ -31,6 +31,7 @@ import { absenceReducer } from './store/absence.reducer';
 import { HttpClientModule } from '@angular/common/http';
 import { EffectsModule } from '@ngrx/effects';
 import { AbsenceEffects } from './store/absence.effects';
+import { UserEffects } from './store/user.effects';
 
 @NgModule({
   declarations: [AppComponent, CalendarComponent, DialogComponent, LoginPage, RegisterPage],
@@ -53,7 +54,7 @@ import { AbsenceEffects } from './store/absence.effects';
     MatProgressSpinnerModule,
     StoreModule.forRoot({ appState: absenceReducer }),
     StoreDevtoolsModule.instrument(),
-    EffectsModule.forRoot([AbsenceEffects]),
+    EffectsModule.forRoot([AbsenceEffects, UserEffects]),
     HttpClientModule,
     AppRoutingModule,
   ],

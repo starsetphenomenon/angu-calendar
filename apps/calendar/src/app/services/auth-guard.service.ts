@@ -11,18 +11,17 @@ export class AuthGuardService implements CanActivate {
     private router: Router,
   ) { }
 
-  validGuard: boolean = false;
-  localToken: string = JSON.parse(localStorage.getItem('token') as string);
-  setGuard(state: boolean) {
-    return this.validGuard = state;
-  }
+  localToken!: string | null;
 
   canActivate(): Observable<boolean> | Promise<boolean> | boolean {
-    if (this.validGuard || this.localToken) {
+    this.localToken = localStorage.getItem('token');
+    if (this.localToken !== 'pending' && this.localToken !== null) {
       return true;
     }
-    return this.router.navigate(['/login']);
+    setTimeout(_ => {
+      this.router.navigate(['/login']);
+    }, 3000);
+    return false;
   }
-
 
 }

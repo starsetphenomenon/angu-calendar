@@ -16,11 +16,11 @@ export class UserService {
     ) { }
 
     async validateUser(id: number) {
-        const userExist = await this.userRepository.findOneBy({ id });
-        if (!userExist) {
+        const user = await this.userRepository.findOneBy({ id });
+        if (!user) {
             throw new UnauthorizedException('Wrong Token!');
         }
-        return userExist;
+        return user;
     }
 
     async loginUser(user: UserDto) {
@@ -29,11 +29,11 @@ export class UserService {
         });
 
         if (!userExist) {
-            throw new UnauthorizedException('User does not exist!');
+            throw new UnauthorizedException('Wrong credentials!');
         }
 
         if (!await bcrypt.compare(user.password, userExist.password)) {
-            throw new UnauthorizedException('Wrong password!');
+            throw new UnauthorizedException('Wrong credentials!');
         }
 
         return await this.jwtService.signAsync({ id: userExist.id });

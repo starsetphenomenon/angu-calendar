@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import { AbsenceItem, User } from '../components/calendar/calendar.component';
+import { AbsenceItem } from '../components/calendar/calendar.component';
 import {
   addAbsence,
   deleteAbsence,
@@ -11,7 +11,6 @@ import {
   setStatusError,
   setStatusPending,
   setStatusSucces,
-  setToken,
   updateAbsence,
   updateAvailableDays,
 } from './absence.actions';
@@ -37,7 +36,6 @@ export interface AppState {
   availableDays: AvailableDays;
   status: 'pending' | 'success' | 'error';
   errorMessage: string;
-  token: string;
 }
 
 const initialState: AppState = {
@@ -54,7 +52,6 @@ const initialState: AppState = {
   absences: [],
   status: 'pending',
   errorMessage: '',
-  token: '',
 };
 
 export const absenceReducer = createReducer(
@@ -124,13 +121,6 @@ export const absenceReducer = createReducer(
   on(registerUser, (state) => {
     return {
       ...state,
-      userCreated: false,
-    };
-  }),
-  on(setToken, (state, action) => {
-    return {
-      ...state,
-      token: action.token,
     };
   }),
   on(setErrorMessage, (state, action) => {
