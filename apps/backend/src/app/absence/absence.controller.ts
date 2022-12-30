@@ -22,8 +22,9 @@ export class AbsenceController {
 
     @UseGuards(AuthGuard('jwt'))
     @Post()
-    async addAbsence(@Body() body: { userToken: string, absence: AbsenceDto }) {
-        return this.absenceService.addAbsence(body);
+    async addAbsence(@Body() body: AbsenceDto,
+        @Headers() headers: { authorization: string }) {
+        return this.absenceService.addAbsence(headers.authorization.slice(7), body);
     }
 
     @UseGuards(AuthGuard('jwt'))
