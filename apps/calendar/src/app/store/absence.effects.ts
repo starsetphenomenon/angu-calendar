@@ -15,8 +15,8 @@ export class AbsenceEffects {
   getAbsences$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.getAllAbsences),
-      exhaustMap(({ token }) => {
-        return this.absencesService.getAllAbsences(token);
+      exhaustMap(() => {
+        return this.absencesService.getAllAbsences();
       }),
       switchMap((absences) => {
         return [

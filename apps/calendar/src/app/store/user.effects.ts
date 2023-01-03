@@ -20,14 +20,18 @@ export class UserEffects {
                     .pipe(
                         catchError((error) => of(error)));
             }),
-            switchMap((user) => {
-                if (user.error) {
-                    return [actions.setErrorMessage({ message: user.error.message })];
-                }
-                this.authService.setLocalToken('pending');
-                this.authService.redirectToLogin();
-                return [];
+            concatMap((user) => {
+                return this.authService.loginUser(user).pipe(
+                    catchError((error) => of(error)));
             }),
+            switchMap((response) => {
+                if (response.status !== 201) {
+                    return [actions.setErrorMessage({ message: response.error.message })];
+                }
+                this.authService.setLocalToken(response.error.text);
+                this.authService.redirectToCalendar();
+                return [];
+            }),    
             catchError((error) => of(actions.setErrorMessage(error), error)),
         )
     );

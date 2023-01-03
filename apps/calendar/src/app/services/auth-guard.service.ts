@@ -18,9 +18,7 @@ export class AuthGuardService implements CanActivate {
     if (this.localToken !== 'pending' && this.localToken !== null) {
       return true;
     }
-    setTimeout(_ => {
-      this.router.navigate(['/login']);
-    }, 3000);
+
     return false;
   }
 

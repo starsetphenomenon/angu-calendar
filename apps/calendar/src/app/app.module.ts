@@ -28,10 +28,11 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AbsencesService } from './services/absences.service';
 import { AuthService } from './services/auth.service'
 import { absenceReducer } from './store/absence.reducer';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { EffectsModule } from '@ngrx/effects';
 import { AbsenceEffects } from './store/absence.effects';
 import { UserEffects } from './store/user.effects';
+import { TokenInterceptor } from './services/token.interceptor';
 
 @NgModule({
   declarations: [AppComponent, CalendarComponent, DialogComponent, LoginPage, RegisterPage],
@@ -58,7 +59,14 @@ import { UserEffects } from './store/user.effects';
     HttpClientModule,
     AppRoutingModule,
   ],
-  providers: [{ provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, AbsencesService, AuthService],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }, AbsencesService, AuthService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

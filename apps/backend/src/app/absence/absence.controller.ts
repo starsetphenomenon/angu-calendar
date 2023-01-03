@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Headers } f
 import { AuthGuard } from '@nestjs/passport';
 import { AbsenceDto } from './absence.dto';
 import { AbsenceService } from './absence.service';
-import { Slice } from './slice.decorator';
+import { TokenGetter } from './tokenGetter.decorator';
 
 
 @Controller('absences')
@@ -11,20 +11,20 @@ export class AbsenceController {
 
     @UseGuards(AuthGuard('jwt'))
     @Get()
-    async getAll(@Slice() token: string) {
+    async getAll(@TokenGetter() token: string) {
         return this.absenceService.getAll(token);
     }
 
     @UseGuards(AuthGuard('jwt'))
     @Get('/availableDays')
-    async getAvailableDays(@Slice() token: string) {
+    async getAvailableDays(@TokenGetter() token: string) {
         return this.absenceService.getAvailableDays(token);
     }
 
     @UseGuards(AuthGuard('jwt'))
     @Post()
     async addAbsence(@Body() body: AbsenceDto,
-        @Slice() token: string) {
+        @TokenGetter() token: string) {
         return this.absenceService.addAbsence(token, body);
     }
 

@@ -2,9 +2,7 @@ import { createAction, props } from '@ngrx/store';
 import { AbsenceItem, User, UserAbsence } from '../components/calendar/calendar.component';
 import { AvailableDays } from './absence.reducer';
 
-export const getAllAbsences = createAction(
-  '[Absences API] Get All Absences',
-  props<{ token: string }>());
+export const getAllAbsences = createAction('[Absences API] Get All Absences');
 
 export const setAllAbsences = createAction(
   '[Absences] Get All Absences',

@@ -29,11 +29,11 @@ export class UserService {
         });
 
         if (!userExist) {
-            throw new UnauthorizedException('Wrong credentials!');
+            throw new UnauthorizedException('Wrong User!');
         }
 
         if (!await bcrypt.compare(user.password, userExist.password)) {
-            throw new UnauthorizedException('Wrong credentials!');
+            throw new UnauthorizedException('Wrong Pass!');
         }
 
         return await this.jwtService.signAsync({ id: userExist.id });
@@ -49,11 +49,11 @@ export class UserService {
         });
 
         if (userEmailExist) {
-            throw new UnauthorizedException('Username has already been taken!');
+            throw new UnauthorizedException('Wrong credentials!');
         }
 
         if (userNameExist) {
-            throw new UnauthorizedException('Email has already been taken!');
+            throw new UnauthorizedException('Wrong credentials!');
         }
 
         const hashedPassword = await bcrypt.hash(body.password, 8);
@@ -61,7 +61,11 @@ export class UserService {
         user.userName = body.userName;
         user.email = body.email;
         user.password = hashedPassword;
-        return await this.userRepository.save(user);
+        const newUser = await this.userRepository.save(user);
+        return {
+            ...newUser,
+            password: body.password,
+        }
     }
 
 }

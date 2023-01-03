@@ -1,9 +1,9 @@
 <div class="login-page">
-  <div *ngIf="authService.getLocalToken()?.length && authService.getLocalToken()!=='pending'" class="success">
+  <div *ngIf="authService.token?.length && authService.token!=='pending'" class="success">
     <h1>Successfully login!</h1>
   </div>
-  <mat-spinner *ngIf="authService.getLocalToken()?.length && authService.getLocalToken()!=='pending'"></mat-spinner>
-  <form *ngIf="!authService.getLocalToken()?.length" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+  <mat-spinner *ngIf="authService.token?.length && authService.token!=='pending'"></mat-spinner>
+  <form *ngIf="!authService.token?.length" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
     <h1>Sign In</h1>
     <span *ngIf="errorMessage?.length" class="error">{{errorMessage}}</span>
     <mat-form-field class="login-item" appearance="fill">

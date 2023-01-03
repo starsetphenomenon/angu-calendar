@@ -42,7 +42,7 @@ export class AuthService {
         localStorage.setItem('token', token);
     }
 
-    getLocalToken() {
+    get token() {
         return localStorage.getItem('token');
     }
 }

@@ -100,9 +100,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.localToken = this.authService.getLocalToken();
+    this.localToken = this.authService.token;
     if (this.localToken !== null) {
-      this.store.dispatch(getAllAbsences({ token: this.localToken }));
+      this.store.dispatch(getAllAbsences());
     }
     this.availableDays$ = this.store.select((store) => store.appState.availableDays);
     this.availableDays$

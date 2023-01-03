@@ -1,9 +1,9 @@
   <div class="register-page">
-    <div *ngIf="authService.getLocalToken()?.length" class="created">
+    <div *ngIf="authService.token?.length" class="created">
       <h1>User successfully created!</h1>
     </div>
-    <mat-spinner *ngIf="authService.getLocalToken()?.length"></mat-spinner>
-    <form *ngIf="!authService.getLocalToken()?.length" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+    <mat-spinner *ngIf="authService.token?.length"></mat-spinner>
+    <form *ngIf="!authService.token?.length" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
       <h1>Registration</h1>
       <span *ngIf="errorMessage?.length" class="error">{{errorMessage}}</span>
       <mat-form-field class="register-item" appearance="outline">

@@ -1,6 +1,7 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHandler, HttpHeaders, HttpParams, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import { AbsenceItem, User, UserAbsence } from '../components/calendar/calendar.component';
 import { getAllAbsences } from '../store/absence.actions';
 import { AppState, AvailableDays } from '../store/absence.reducer';
@@ -21,20 +22,16 @@ export class AbsencesService {
   BASE_URL: string = 'http://localhost:3333';
   API: string = 'api/absences';
 
-  getAllAbsences(token: string) {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    });
-    return this.http.get<AbsenceItem[]>(`${this.BASE_URL}/${this.API}`, { headers });
+  getAllAbsences() {
+    return this.http.get<AbsenceItem[]>(`${this.BASE_URL}/${this.API}`);
   }
 
   getAvailableDays() {
-    return this.http.get<AvailableDays>(`${this.BASE_URL}/${this.API}/availableDays`, { headers: this.getHeaders() });
+    return this.http.get<AvailableDays>(`${this.BASE_URL}/${this.API}/availableDays`);
   }
 
   addAbsence(absence: AbsenceItem) {
-    return this.http.post(`${this.BASE_URL}/${this.API}`, absence, { headers: this.getHeaders() });
+    return this.http.post(`${this.BASE_URL}/${this.API}`, absence);
   }
 
   deleteAbsence(id: number) {
@@ -46,19 +43,7 @@ export class AbsencesService {
   }
 
   updateAbsences() {
-    const token = this.authService.getLocalToken();
-    if (token !== null) {
-      this.store.dispatch(getAllAbsences({ token }));
-    }
-  }
-
-  getHeaders() {
-    const token = this.authService.getLocalToken();
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
-    return headers;
+    this.store.dispatch(getAllAbsences());
   }
 
 }
