@@ -1,22 +1,35 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AbsenceModule } from './absence/absence.module';
+import { UserModule } from './user/user.module';
 
 import { AbsenceEntity } from './absence/absence.entity';
+import { UserEntity } from './user/user.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
     type: 'postgres',
-    host: 'db.thin.dev',
-    port: 5432,
-    username: 'bIQhpdhPUbQoiXVeUIAXCXJwbCKVKKxK',
-    password: 'DFhsQtxeHASiSDjuPYThLPJrPInbPBMb',
-    database: 'c3fd690d-1f53-4b5a-a611-2858d5be6e41',
-    entities: [AbsenceEntity],
-    migrations: [AbsenceEntity],
+    host: 'containers-us-west-90.railway.app',
+    port: 6685,
+    username: 'postgres',
+    password: 'D2LoBbSMM0Z0i0VaqzGX',
+    database: 'railway',
+    entities: [AbsenceEntity, UserEntity],
+    migrations: [AbsenceEntity, UserEntity],
     synchronize: true,
   }),
     AbsenceModule,
+    UserModule,
+  {
+    ...JwtModule.register({
+      secret: 'secretKey',
+      signOptions: {
+        expiresIn: '600s',
+      }
+    }),
+    global: true,
+  }
   ],
   controllers: [],
   providers: [],

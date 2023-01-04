@@ -6,4 +6,5 @@ export class AbsenceDto {
     @IsString({ always: true }) fromDate!: string;
     @IsString({ always: true }) toDate!: string;
     @IsString({ always: true }) comment!: string;
+    @IsString({ always: true }) userName!: string;
 }

@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { AppState, AvailableDays, Dialogs } from '../../store/absence.reducer';
 import { getAllAbsences, setStatusPending } from '../../store/absence.actions';
 import { AbsenceTypeEnums } from 'shared';
+import { AuthService } from '../../services/auth.service';
 
 interface CalendarItem {
   day: string;
@@ -16,12 +17,25 @@ interface CalendarItem {
   fullDate: string;
 }
 
+export interface UserAbsence {
+  userToken: string;
+  absence: AbsenceItem;
+}
+
+export interface User {
+  id?: number;
+  userName: string;
+  email: string;
+  password: string;
+}
+
 export interface AbsenceItem {
   id: number;
   absenceType: string;
   fromDate: string;
   toDate: string;
   comment: string;
+  userName?: string;
 }
 
 export interface AbsenceType {
@@ -77,17 +91,20 @@ export class CalendarComponent implements OnInit, OnDestroy {
   availableDays$?: Observable<AvailableDays>;
   status?: string;
   status$?: Observable<string>;
+  localToken!: string | null;
 
   constructor(
     public absencesService: AbsencesService,
-    private store: Store<{ appState: AppState }>
-  ) {}
+    private store: Store<{ appState: AppState }>,
+    private authService: AuthService,
+  ) { }
 
   ngOnInit(): void {
-    this.store.dispatch(getAllAbsences());
-    this.availableDays$ = this.store.select(
-      (store) => store.appState.availableDays
-    );
+    this.localToken = this.authService.token;
+    if (this.localToken !== null) {
+      this.store.dispatch(getAllAbsences());
+    }
+    this.availableDays$ = this.store.select((store) => store.appState.availableDays);
     this.availableDays$
       .pipe(takeUntil(this.destroy$))
       .subscribe((availableDays) => (this.availableDays = availableDays));
@@ -114,6 +131,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next(true);
     this.destroy$.unsubscribe();
+    localStorage.removeItem('token');
   }
 
   filterByAbsence() {
@@ -134,8 +152,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     currentDay
       ? (this.absencesService.currentAbsenceDate = currentDay)
       : (this.absencesService.currentAbsenceDate = moment(this.dateNow).format(
-          'YYYY-MM-DD'
-        ));
+        'YYYY-MM-DD'
+      ));
 
     if (dialog === 'requestDialog') {
       this.currentAbsence = {

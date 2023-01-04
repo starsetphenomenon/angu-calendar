@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { AbsenceItem } from '../components/calendar/calendar.component';
+import { AbsenceItem, User, UserAbsence } from '../components/calendar/calendar.component';
 import { AvailableDays } from './absence.reducer';
 
 export const getAllAbsences = createAction('[Absences API] Get All Absences');
@@ -29,6 +29,21 @@ export const deleteAbsence = createAction(
 export const updateAbsence = createAction(
   '[Absences] Update Absence',
   props<{ id: number; newAbsence: AbsenceItem }>()
+);
+
+export const registerUser = createAction(
+  '[Users] register User',
+  props<User>()
+);
+
+export const loginUser = createAction(
+  '[Users] Check User Authentication',
+  props<User>()
+);
+
+export const setErrorMessage = createAction(
+  '[Error] Set Message',
+  props<{ message: string }>()
 );
 
 export const setStatusSucces = createAction('[Status] Set Status Secces');

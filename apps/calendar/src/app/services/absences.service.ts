@@ -1,18 +1,25 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpHandler, HttpHeaders, HttpParams, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AbsenceItem } from '../components/calendar/calendar.component';
-import { AvailableDays } from '../store/absence.reducer';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { AbsenceItem, User, UserAbsence } from '../components/calendar/calendar.component';
+import { getAllAbsences } from '../store/absence.actions';
+import { AppState, AvailableDays } from '../store/absence.reducer';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AbsencesService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+    private store: Store<{ appState: AppState }>,
+    private authService: AuthService,
+  ) { }
 
   currentAbsenceDate!: string;
   currentAbsenceID!: number;
 
-  BASE_URL: string = 'https://calendar-back.azurewebsites.net';
+  BASE_URL: string = 'http://localhost:3333';
   API: string = 'api/absences';
 
   getAllAbsences() {
@@ -20,9 +27,7 @@ export class AbsencesService {
   }
 
   getAvailableDays() {
-    return this.http.get<AvailableDays>(
-      `${this.BASE_URL}/${this.API}/availableDays`
-    );
+    return this.http.get<AvailableDays>(`${this.BASE_URL}/${this.API}/availableDays`);
   }
 
   addAbsence(absence: AbsenceItem) {
@@ -36,4 +41,9 @@ export class AbsencesService {
   updateAbsence(id: number, newAbsence: AbsenceItem) {
     return this.http.put(`${this.BASE_URL}/${this.API}/${id}`, newAbsence);
   }
+
+  updateAbsences() {
+    this.store.dispatch(getAllAbsences());
+  }
+
 }

@@ -6,6 +6,7 @@ import {
   getAllAbsences,
   setAllAbsences,
   setAvailableDays,
+  setErrorMessage,
   setStatusError,
   setStatusPending,
   setStatusSucces,
@@ -33,6 +34,7 @@ export interface AppState {
   absences: AbsenceItem[];
   availableDays: AvailableDays;
   status: 'pending' | 'success' | 'error';
+  errorMessage: string;
 }
 
 const initialState: AppState = {
@@ -48,6 +50,7 @@ const initialState: AppState = {
   },
   absences: [],
   status: 'pending',
+  errorMessage: '',
 };
 
 export const absenceReducer = createReducer(
@@ -112,6 +115,12 @@ export const absenceReducer = createReducer(
     return {
       ...state,
       status: 'error',
+    };
+  }),
+  on(setErrorMessage, (state, action) => {
+    return {
+      ...state,
+      errorMessage: action.message,
     };
   })
 );

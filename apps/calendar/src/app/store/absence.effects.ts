@@ -4,12 +4,13 @@ import { catchError, concatMap, exhaustMap, map, of, switchMap } from 'rxjs';
 import { AbsencesService } from '../services/absences.service';
 import * as actions from './absence.actions';
 
+
 @Injectable()
 export class AbsenceEffects {
   constructor(
     private actions$: Actions,
-    private absencesService: AbsencesService
-  ) {}
+    private absencesService: AbsencesService,
+  ) { }
 
   getAbsences$ = createEffect(() =>
     this.actions$.pipe(
@@ -48,7 +49,8 @@ export class AbsenceEffects {
         return this.absencesService.addAbsence(absence);
       }),
       switchMap(() => {
-        return [actions.getAllAbsences(), actions.updateAvailableDays()];
+        this.absencesService.updateAbsences();
+        return [actions.updateAvailableDays()];
       }),
       catchError((error) => of(actions.setStatusError(), error))
     )
@@ -61,7 +63,8 @@ export class AbsenceEffects {
         return this.absencesService.deleteAbsence(action.payload);
       }),
       switchMap(() => {
-        return [actions.getAllAbsences(), actions.updateAvailableDays()];
+        this.absencesService.updateAbsences();
+        return [actions.updateAvailableDays()];
       }),
       catchError((error) => of(actions.setStatusError(), error))
     )
@@ -74,9 +77,11 @@ export class AbsenceEffects {
         return this.absencesService.updateAbsence(action.id, action.newAbsence);
       }),
       switchMap(() => {
-        return [actions.getAllAbsences(), actions.updateAvailableDays()];
+        this.absencesService.updateAbsences();
+        return [actions.updateAvailableDays()];
       }),
       catchError((error) => of(actions.setStatusError(), error))
     )
   );
+
 }
