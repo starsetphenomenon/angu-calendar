@@ -4,7 +4,6 @@ import {
   addAbsence,
   deleteAbsence,
   getAllAbsences,
-  registerUser,
   setAllAbsences,
   setAvailableDays,
   setErrorMessage,
@@ -116,11 +115,6 @@ export const absenceReducer = createReducer(
     return {
       ...state,
       status: 'error',
-    };
-  }),
-  on(registerUser, (state) => {
-    return {
-      ...state,
     };
   }),
   on(setErrorMessage, (state, action) => {

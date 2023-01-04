@@ -1,8 +1,8 @@
 <div class="login-page">
-  <div *ngIf="authService.token?.length && authService.token!=='pending'" class="success">
+  <div *ngIf="authService.token?.length" class="success">
     <h1>Successfully login!</h1>
   </div>
-  <mat-spinner *ngIf="authService.token?.length && authService.token!=='pending'"></mat-spinner>
+  <mat-spinner *ngIf="authService.token?.length"></mat-spinner>
   <form *ngIf="!authService.token?.length" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
     <h1>Sign In</h1>
     <span *ngIf="errorMessage?.length" class="error">{{errorMessage}}</span>

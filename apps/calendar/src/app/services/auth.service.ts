@@ -19,23 +19,11 @@ export class AuthService {
     API: string = 'api/users';
 
     registerUser(user: User) {
-        return this.http.post<User>(`${this.BASE_URL}/${this.API}/register`, user);
+        return this.http.post<string>(`${this.BASE_URL}/${this.API}/register`, user, { responseType: 'text' as 'json' });
     }
 
     loginUser(user: User) {
-        return this.http.post<User>(`${this.BASE_URL}/${this.API}/login`, user);
-    }
-
-    redirectToRegister() {
-        this.router.navigate(['/register']);
-    }
-
-    redirectToLogin() {
-        this.router.navigate(['/login']);
-    }
-
-    redirectToCalendar() {
-        this.router.navigate(['/calendar']);
+        return this.http.post<string>(`${this.BASE_URL}/${this.API}/login`, user, { responseType: 'text' as 'json' });
     }
 
     setLocalToken(token: string) {

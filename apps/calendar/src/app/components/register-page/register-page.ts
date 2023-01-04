@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -21,6 +22,7 @@ export class RegisterPage implements OnInit, OnDestroy {
     constructor(
         private store: Store<{ appState: AppState }>,
         public authService: AuthService,
+        private router: Router,
     ) { }
 
     ngOnInit(): void {
@@ -50,6 +52,6 @@ export class RegisterPage implements OnInit, OnDestroy {
     }
 
     goToLogin() {
-        this.authService.redirectToLogin();
+        this.router.navigate(['/login']);
     }
 }

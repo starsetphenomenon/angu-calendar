@@ -1,5 +1,5 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
@@ -29,13 +29,12 @@ export class UserService {
         });
 
         if (!userExist) {
-            throw new UnauthorizedException('Wrong User!');
+            throw new UnauthorizedException('Wrong credentials!');
         }
 
         if (!await bcrypt.compare(user.password, userExist.password)) {
-            throw new UnauthorizedException('Wrong Pass!');
+            throw new UnauthorizedException('Wrong credentials!');
         }
-
         return await this.jwtService.signAsync({ id: userExist.id });
     }
 
@@ -49,11 +48,11 @@ export class UserService {
         });
 
         if (userEmailExist) {
-            throw new UnauthorizedException('Wrong credentials!');
+            throw new BadRequestException('Email already exist!');
         }
 
         if (userNameExist) {
-            throw new UnauthorizedException('Wrong credentials!');
+            throw new BadRequestException('Username already exist!');
         }
 
         const hashedPassword = await bcrypt.hash(body.password, 8);
@@ -62,10 +61,7 @@ export class UserService {
         user.email = body.email;
         user.password = hashedPassword;
         const newUser = await this.userRepository.save(user);
-        return {
-            ...newUser,
-            password: body.password,
-        }
+        return await this.jwtService.signAsync({ id: newUser.id });
     }
 
 }

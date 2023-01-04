@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router, CanActivate } from '@angular/router';
+import { CanActivate } from '@angular/router';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -7,15 +7,13 @@ import { Observable } from 'rxjs';
 })
 export class AuthGuardService implements CanActivate {
 
-  constructor(
-    private router: Router,
-  ) { }
+  constructor() { }
 
   localToken!: string | null;
 
   canActivate(): Observable<boolean> | Promise<boolean> | boolean {
     this.localToken = localStorage.getItem('token');
-    if (this.localToken !== 'pending' && this.localToken !== null) {
+    if (this.localToken !== null) {
       return true;
     }
 
