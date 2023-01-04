@@ -17,22 +17,19 @@ export class UserEffects {
     registerUser$ = createEffect(() =>
         this.actions$.pipe(
             ofType(actions.registerUser),
-            switchMap((user) => {
+            mergeMap((user) => {
                 return this.authService.registerUser(user)
                     .pipe(
+                        tap(resp => {
+                            this.authService.setLocalToken(resp);
+                            this.router.navigate(['/calendar']);
+                        }),
                         catchError((error) => {
-                            return throwError(error);
+                            return of(actions.setErrorMessage({ message: error.message }));
                         }));
-            }),
-            concatMap((response) => {
-                this.authService.setLocalToken(response);
-                this.router.navigate(['/calendar']);
-                return [];
-            }),
-            catchError((error) => {
-                return of(actions.setErrorMessage({ message: error.error.message }))
             })
-        )
+
+        ), { dispatch: false }
     );
 
     loginUser$ = createEffect(() =>
